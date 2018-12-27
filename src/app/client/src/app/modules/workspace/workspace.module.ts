@@ -16,7 +16,7 @@ import {
   UpforreviewContentplayerComponent, FlagConentplayerComponent, ReviewsubmissionsContentplayerComponent,
   PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, AllMyContentFilterComponent, CollaboratingOnComponent,
-  CollaborationContentFilterComponent
+  CollaborationContentFilterComponent, TeachingPackComponent, PadagogyTopicSelectorComponent
 } from './components';
 import { NgInviewModule } from 'angular-inport';
 import { TelemetryModule } from '@sunbird/telemetry';
@@ -53,6 +53,8 @@ import { OrderModule } from 'ngx-order-pipe';
     CollaborationContentFilterComponent,
     ReviewCommentsComponent,
     CollaborationContentFilterComponent,
+    TeachingPackComponent,
+    PadagogyTopicSelectorComponent
   ],
   providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService]
 })
