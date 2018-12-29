@@ -1,0 +1,65 @@
+<div class="ui segment">
+  <div class="ui grid">
+    <div class="one wide column"></div>
+    <div class="ten wide stretched column">
+      <div class="ui segment">
+        <div class="ui grid">
+          <div class="workspacesegment pusher nine wide column">
+            <form class="ui form">
+              <div class="content">
+                <div class="ui grid">
+                  <div class="twelve wide column">
+                    <div class="field">
+                      <label>
+                        Name
+                      </label>
+                      <div class="field">
+                        <input name="name" type="text">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="twelve wide column">
+                    <div class="field">
+                      <label>
+                        ShortDescription
+                      </label>
+                      <div class="field">
+                        <input name="name" type="text">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div class="ui grid">
+              <div class="four wide column" *ngFor="let step of padagogyFlow?.pedagogyStep">
+                <div class="ui card">
+                  <div class="ui sub header content">
+                    <div class="center aligned description">
+                      <p>{{step}}</p>
+                    </div>
+                  </div>
+                  <div class="extra content">
+                    <div class="center aligned author">
+                      <div class="ui bottom attached button" (click)="addNewMethod()">
+                        <i class="add icon"></i>
+                        Add Method
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="actions actions margin-top-15">
+              <div class="ui primary right floated  button">
+                <i class="cloud upload icon"></i>
+                Save
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="one wide column"></div>
+  </div>
+</div>

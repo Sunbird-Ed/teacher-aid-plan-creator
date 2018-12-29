@@ -7,7 +7,8 @@ import {
   BatchListComponent, UpdateBatchComponent, UpforreviewContentplayerComponent, ReviewsubmissionsContentplayerComponent,
   FlagConentplayerComponent, PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, CollaboratingOnComponent, TeachingPackComponent,
-  PadagogyTopicSelectorComponent} from './components';
+  PadagogyTopicSelectorComponent, CreateTeachingPackComponent, CreateTeachingMethodComponent
+} from './components';
 import { AuthGuard } from '../core/guard/auth-gard.service';
 const telemetryEnv = 'workspace';
 const objectType = 'workspace';
@@ -84,7 +85,30 @@ const routes: Routes = [
               }, breadcrumbs: [{ label: 'Home', url: '/home' },
               { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
             }
-          }
+          },
+        ]
+      },
+      {
+        path: 'teachingpack/:pageNumber', component: TeachingPackComponent, canActivate: [AuthGuard],
+        data: {
+          telemetry: {
+            env: telemetryEnv, pageid: 'workspace-content-teachingpack', subtype: 'paginate', uri: 'workspace/content/teachingpack',
+            type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
+          }, roles: 'allContentRole',
+          breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
+        },
+        children: [
+          {
+            path: 'selecttopic', component: PadagogyTopicSelectorComponent,
+            data: {
+              telemetry: {
+                env: telemetryEnv, pageid: 'workspace-content-teachingpack-selecttopic',
+                subtype: 'paginate', uri: 'workspace/content/teachingpack-selecttopic',
+                type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
+              }, roles: 'allContentRole',
+              breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
+            }
+          },
         ]
       },
       {
@@ -204,27 +228,6 @@ const routes: Routes = [
         }
       },
       {
-        path: 'teachingpack/:pageNumber', component: TeachingPackComponent, canActivate: [AuthGuard],
-        data: {
-          telemetry: {
-            env: telemetryEnv, pageid: 'workspace-content-teachingpack', subtype: 'paginate', uri: 'workspace/content/teachingpack',
-            type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
-          }, roles: 'allContentRole',
-          breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
-        }
-      },
-      {
-        path: 'selecttopic', component: PadagogyTopicSelectorComponent, canActivate: [AuthGuard],
-        data: {
-          telemetry: {
-            env: telemetryEnv, pageid: 'workspace-content-teachingpack-selecttopic',
-            subtype: 'paginate', uri: 'workspace/content/teachingpack-selecttopic',
-            type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
-          }, roles: 'allContentRole',
-          breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
-        }
-      },
-      {
         path: 'flagreviewer/:pageNumber', component: FlagReviewerComponent, canActivate: [AuthGuard],
         data: {
           telemetry: {
@@ -239,7 +242,7 @@ const routes: Routes = [
         data: {
           telemetry: {
             env: telemetryEnv, pageid: 'workspace-content-collaborating-on',
-      subtype: 'paginate', uri: 'workspace/content/collaborating-on',
+            subtype: 'paginate', uri: 'workspace/content/collaborating-on',
             type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
           }, roles: 'collaboratingRole',
           breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
@@ -282,6 +285,27 @@ const routes: Routes = [
       roles: 'workspace',
       breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
     }
+  },
+  {
+    path: 'new/teachingpack/:contentId', component: CreateTeachingPackComponent,
+    data: {
+      telemetry: {
+        env: telemetryEnv, pageid: 'workspace-content-teachingpack', subtype: 'paginate', uri: 'workspace/content/teachingpack',
+        type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
+      }, roles: 'allContentRole',
+      breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
+    },
+  },
+  {
+      path: 'new/teachingpack/:contentId/teachingmethod', component: CreateTeachingMethodComponent,
+      data: {
+        telemetry: {
+          env: telemetryEnv, pageid: 'workspace-content--create-teachingpack', subtype: 'paginate',
+          uri: 'workspace/content/teachingpack/create',
+          type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
+        }, roles: 'allContentRole',
+        breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
+      }
   }
 ];
 

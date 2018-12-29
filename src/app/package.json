@@ -75,6 +75,8 @@
     "tenants-push-cdn": "gulp pushTenantsToCDN --gulpfile gulp-tenant.js"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-angular": "^1.0.1",
+    "@ckeditor/ckeditor5-build-classic": "^11.2.0",
     "@project-sunbird/discussion-service": "0.0.6",
     "@project-sunbird/ext-framework-server": "0.1.10",
     "@project-sunbird/form-service": "0.0.10",

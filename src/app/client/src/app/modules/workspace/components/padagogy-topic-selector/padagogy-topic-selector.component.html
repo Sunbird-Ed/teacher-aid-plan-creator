@@ -1,43 +1,81 @@
-<sui-modal [isClosable]="true" [size]="'small'" [isFullScreen]="false" [mustScroll]="true" (dismissed)="goToCreate(); "
+<sui-modal [isClosable]="true" [size]="'small'" [isFullScreen]="false" [mustScroll]="true" (dismissed)="goToTeachingPack(); "
   #modal>
-  <div class="ui center aligned header">
-    Select Padagogy Flow & Topic(s)
-  </div>
-  <div class="ui content margin-top-0">
-    <div class="ui segment">
-      <h6 class="ui horizontal divider">
-        Padagogy Flow
-      </h6>
-      <ng-template let-option #optionTemplate>
-        <div class="margin-bottom-10">
-          <b>{{ option.name }}</b>
-        </div>
-        <div class="ui horizontal bulleted list">
-          <li class="item" *ngFor="let data of option.pedagogyStep">{{ data }}</li>
-        </div>
-      </ng-template>
-      <sui-select class="selection fluid" [(ngModel)]="selectedFlow" [options]="padagogyList" labelField="name"
-        [optionTemplate]="optionTemplate" [isSearchable]="true" #templated>
-        <sui-select-option *ngFor="let o of templated.filteredOptions" [value]="o"></sui-select-option>
-      </sui-select>
-    </div>
-    <div class="ui segment">
-      <h6 class="ui horizontal divider">
-        Topics
-      </h6>
-      <div>
-        <div class="ui relaxed divided list">
-          <div (click)="selectTopic(data)" class="item" *ngFor="let data of topics">
-            <i *ngIf="data.selected" class="check icon"></i> {{data.name}}
+  <div *ngIf="!showTopicSelector else topicsSec" class="ui segment mt-10">
+      <form class="ui form">
+          <div class="content">
+              <div *ngIf="formFieldProperties && categoryMasterList">
+                  <app-content-creation-default-template #formData [formFieldProperties]="formFieldProperties" [categoryMasterList]="categoryMasterList">
+                  </app-content-creation-default-template>
+              </div>
+              <div class="actions mt-10">
+                  <p class="text-align-center pt-20">
+                      <button class="ui primary text-align-center icon button" (click)="createContent()">
+                          {{resourceService?.frmelmnts?.btn?.startcreating}}
+                      </button>
+                  </p>
+                  
+                  <div>
+                      <label>
+                          <p class="text-align-center mt-10">
+                              {{resourceService?.frmelmnts?.lbl?.agreeandproceedtext}}
+                          </p>
+                      </label>
+                  </div>
+              </div>
           </div>
-        </div>
-      </div>
-    </div>
+      </form>
   </div>
-  <div class="actions">
-    <button (click)="goNext()" [disabled]="!!!selectedTopic.length || !!!selectedFlow?.name" class="ui primary button">
-      Proceed
-      <i class="right chevron icon"></i>
-    </button>
-  </div>
-</sui-modal>
+  <ng-template #topicsSec>
+          <div class="ui center aligned header">
+              Select Padagogy Flow & Topic(s)
+            </div>
+            <div class="ui content margin-top-0">
+              <div class="ui segment">
+                <h6 class="ui horizontal divider">
+                  Padagogy Flow
+                </h6>
+                <ng-template let-option #optionTemplate>
+                  <div class="margin-bottom-10">
+                    <b>{{ option.name }}</b>
+                  </div>
+                  <div class="ui horizontal bulleted list">
+                    <li class="item" *ngFor="let data of option.pedagogyStep">{{ data }}</li>
+                  </div>
+                </ng-template>
+                <sui-select class="selection fluid" [(ngModel)]="selectedFlow" [options]="padagogyList" labelField="name"
+                  [optionTemplate]="optionTemplate" [isSearchable]="true" #templated>
+                  <sui-select-option *ngFor="let o of templated.filteredOptions" [value]="o"></sui-select-option>
+                </sui-select>
+              </div>
+              <div class="ui segment">
+                <h6 class="ui horizontal divider">
+                  Topics
+                </h6>
+                <div>
+                  <div class="ui vertical following fluid accordion text menu">
+                    <div class="item" *ngFor="let data of topics">
+                      <a class="title">{{data.name}}</a>
+                      <div class="content menu" *ngIf="data?.children?.length">
+                          <div class="item" *ngFor="let d2 of data?.children">
+                            <a class="title">{{d2.name}}</a>
+                            <div class="content menu" *ngIf="data?.children?.children?.length">
+                              <div class="item" *ngFor="let d3 of data?.children?.children">
+                                  <a class="title">{{d3.name}}</a>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- [disabled]="!!!selectedTopic.length || !!!selectedFlow?.name" -->
+            <div class="actions">
+              <button (click)="startCreating()" class="ui primary button">
+                Proceed
+                <i class="right chevron icon"></i>
+              </button>
+            </div>
+  </ng-template>
+</sui-modal> 

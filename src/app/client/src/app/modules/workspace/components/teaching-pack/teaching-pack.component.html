@@ -5,8 +5,8 @@
   <div *ngIf="noResult && !showLoader">
     <app-no-result [data]="noResultMessage"></app-no-result>
   </div>
-  <div (click)="go()" class="ui right aligned basic segment">
-    <button class="ui primary button">Create New</button>
+  <div routerLink="selecttopic" class="ui right aligned basic segment">
+    <div class="ui primary button">Create New</div>
   </div>
   
   <table class="ui upForReviewTable table" *ngIf="allContent.length > 0 && !showLoader && !noResult ">
@@ -89,4 +89,4 @@
 
   <app-contentlock-info-popup [content]="lockPopupData" (closeEvent)="onCloseLockInfoPopup($event)" *ngIf="showLockedContentModal"></app-contentlock-info-popup>
 
-  
+  <router-outlet></router-outlet>

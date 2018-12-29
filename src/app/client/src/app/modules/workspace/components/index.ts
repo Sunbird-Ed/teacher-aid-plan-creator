@@ -1,3 +1,5 @@
+import { from } from 'rxjs';
+
 export * from './content-editors/collection-editor/collection-editor.component';
 export * from './content-editors/content-editor/content-editor.component';
 export * from './content-editors/generic-editor/generic-editor.component';
@@ -29,4 +31,6 @@ export * from './collaborating-on/collaborating-on.component';
 export * from './collaboration-content-filter/collaboration-content-filter.component';
 export * from './teaching-pack/teaching-pack.component';
 export * from './padagogy-topic-selector/padagogy-topic-selector.component';
+export * from './create-teaching-pack/create-teaching-pack.component';
+export * from './create-teaching-method/create-teaching-method.component';
 

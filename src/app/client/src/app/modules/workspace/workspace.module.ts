@@ -16,12 +16,14 @@ import {
   UpforreviewContentplayerComponent, FlagConentplayerComponent, ReviewsubmissionsContentplayerComponent,
   PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, AllMyContentFilterComponent, CollaboratingOnComponent,
-  CollaborationContentFilterComponent, TeachingPackComponent, PadagogyTopicSelectorComponent
+  CollaborationContentFilterComponent, TeachingPackComponent, PadagogyTopicSelectorComponent, CreateTeachingPackComponent,
+  CreateTeachingMethodComponent
 } from './components';
 import { NgInviewModule } from 'angular-inport';
 import { TelemetryModule } from '@sunbird/telemetry';
 import { ReviewCommentsComponent } from './components/review-comments/review-comments.component';
 import { OrderModule } from 'ngx-order-pipe';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 @NgModule({
   imports: [
     CommonModule,
@@ -33,7 +35,8 @@ import { OrderModule } from 'ngx-order-pipe';
     ReactiveFormsModule,
     NgInviewModule,
     TelemetryModule,
-    OrderModule
+    OrderModule,
+    CKEditorModule
   ],
   declarations: [WorkspaceComponent, WorkspacesidebarComponent,
     CreateContentComponent, DraftComponent, ReviewSubmissionsComponent,
@@ -54,7 +57,9 @@ import { OrderModule } from 'ngx-order-pipe';
     ReviewCommentsComponent,
     CollaborationContentFilterComponent,
     TeachingPackComponent,
-    PadagogyTopicSelectorComponent
+    PadagogyTopicSelectorComponent,
+    CreateTeachingPackComponent,
+    CreateTeachingMethodComponent
   ],
   providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService]
 })

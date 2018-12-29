@@ -386,7 +386,7 @@ export class TeachingPackComponent extends WorkSpace implements OnInit {
     });
   }
   go() {
-    this.route.navigate(['workspace/content/selecttopic']);
+    this.route.navigate(['teachingaid']);
   }
 }
 

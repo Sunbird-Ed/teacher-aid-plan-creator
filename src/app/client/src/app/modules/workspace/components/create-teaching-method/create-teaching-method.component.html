@@ -1,0 +1,67 @@
+<div class="ui-segment">
+  <div class="ui grid" style="margin-top:10px;">
+    <div class="one wide column"></div>
+    <div class="ten wide stretched column">
+      <div class="ui segment">
+        <h3 class="ui header">
+          <i class="pencil alternate icon"></i>
+          <div class="content">
+            Teaching Method
+          </div>
+        </h3>
+        <form class="ui form">
+          <div class="content">
+            <div class="ui grid margin-bottom-15">
+              <div class="six wide column">
+                <div class="field">
+                  <label>
+                    Method Type
+                  </label>
+                  <div class="field">
+                    <sui-select id="methodType" name="methodTyoe" class="selection">
+                      <sui-select-option value="Method 1"></sui-select-option>
+                      <sui-select-option value="Method 2"></sui-select-option>
+                      <sui-select-option value="Method 3"></sui-select-option>
+                    </sui-select>
+                  </div>
+                </div>
+              </div>
+              <div class="six wide column">
+                <div class="field">
+                  <label>
+                    Duration (Minutes)
+                  </label>
+                  <div class="field">
+                    <input name="duration" placeholder="45 Minutes" type="number">
+                  </div>
+                </div>
+              </div>
+              <div class="twelve wide column">
+                <div class="field">
+                  <label>
+                    Short Description
+                  </label>
+                  <div class="field">
+                    <input name="shortDescription" type="text">
+                  </div>
+                </div>
+              </div>
+
+              <div class="twelve wide column">
+                <div class="field">
+                  <label>
+                    Long Description
+                  </label>
+                  <div class="field">
+                      <ckeditor [config]="config" [editor]="Editor" data="<p>Hello, world!</p>"></ckeditor>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="one wide column"></div>
+  </div>
+</div>
