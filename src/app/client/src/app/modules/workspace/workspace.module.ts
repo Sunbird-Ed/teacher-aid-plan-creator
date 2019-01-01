@@ -24,6 +24,8 @@ import { TelemetryModule } from '@sunbird/telemetry';
 import { ReviewCommentsComponent } from './components/review-comments/review-comments.component';
 import { OrderModule } from 'ngx-order-pipe';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { TreeNgxModule } from 'tree-ngx';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -36,7 +38,8 @@ import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
     NgInviewModule,
     TelemetryModule,
     OrderModule,
-    CKEditorModule
+    CKEditorModule,
+    TreeNgxModule
   ],
   declarations: [WorkspaceComponent, WorkspacesidebarComponent,
     CreateContentComponent, DraftComponent, ReviewSubmissionsComponent,

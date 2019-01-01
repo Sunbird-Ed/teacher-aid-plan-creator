@@ -7,6 +7,8 @@ import { PublicDataService, SearchService, FormService, UserService } from '@sun
 import { ConfigService, ServerResponse } from '@sunbird/shared';
 import * as _ from 'lodash';
 import { CacheService } from 'ng2-cache-service';
+import { DefaultTemplateComponent } from '../content-creation-default-template/content-creation-default-template.component';
+import { TreeMode } from 'tree-ngx';
 @Component({
   selector: 'app-padagogy-topic-selector',
   templateUrl: './padagogy-topic-selector.component.html',
@@ -14,6 +16,7 @@ import { CacheService } from 'ng2-cache-service';
 })
 export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterContentInit {
   @ViewChild('modal') modal;
+  @ViewChild('formData') formData: DefaultTemplateComponent;
   public frameworkService: FrameworkService;
   public framework: string;
   private searchService: SearchService;
@@ -50,6 +53,9 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
 
   public formFieldProperties: any;
   public frameworkData: object;
+
+  public selectedTopic: any[];
+
   constructor(
     activatedRoute: ActivatedRoute,
     private router: Router,
@@ -75,10 +81,15 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
   filterData: any;
   topics = [];
   padagogyList = [];
-  selectedTopic = [];
   selectedFlow: any;
-  showSelctionScreen: boolean;
   showTopicSelector: boolean;
+  showPadagogySelector: boolean;
+  treeOptions = {
+    mode: TreeMode.SingleSelect,
+    checkboxes: false,
+    alwaysEmitSelected: true,
+    expande: false
+  };
   ngOnInit() {
     this.frameworkService.initialize();
     this.fetchFrameworkMetaData();
@@ -92,26 +103,6 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
       this.modal.deny();
     }
   }
-  /**
-  * fetchFrameworkMetaData is gives form config data
-  */
-  // fetchFrameworkMetaData() {
-  //   this.frameworkService.frameworkData$.subscribe((frameworkData: Framework) => {
-  //     if (!frameworkData.err) {
-  //       this.categoryMasterList = _.cloneDeep(frameworkData.frameworkdata['defaultFramework'].categories);
-  //       this.framework = frameworkData.frameworkdata['defaultFramework'].code;
-  //       console.log('framework is', this.categoryMasterList);
-  //       this.categoryMasterList.map((item) => {
-  //         if (item.code === 'topic') {
-  //           this.topics = item.terms;
-  //         }
-  //       });
-  //       console.log('topics', this.topics);
-  //     } else if (frameworkData && frameworkData.err) {
-  //       this.toasterService.error(this.resourceService.messages.emsg.m0005);
-  //     }
-  //   });
-  // }
 
   fetchFrameworkMetaData() {
 
@@ -172,28 +163,83 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
           this.configService.appConfig.cacheServiceConfig.setTimeInSeconds
       });
   }
-  selectTopic(item) {
-    if (this.selectedTopic.indexOf(item) === -1) {
-      item['selected'] = true;
-      this.selectedTopic.push(item);
-    } else {
-      for (let i = 0; i < this.selectedTopic.length; i++) {
-        if (item.index === this.selectedTopic[i].index) {
-          this.selectedTopic.splice(this.selectedTopic[i], 1);
-          item['selected'] = false;
-        }
-      }
-    }
-  }
 
   goToTeachingPack() {
     this.router.navigate(['workspace/content/teachingpack', 1]);
   }
 
   startCreating() {
-    this.router.navigate(['workspace/new/teachingpack' , 'do_12343324']);
+    this.router.navigate(['workspace/new/teachingpack', 'do_12343324']);
   }
   createContent() {
+    const content = _.pickBy(this.formData.formInputData);
+    const temp = [];
+    let boardTopics = [];
+    let subjectTopics = [];
+    let gradeTopics = [];
+    let mediumTopics = [];
+    this.categoryMasterList.map((item) => {
+      if (item.code === 'board') {
+        item.terms.map((item2) => {
+          if (item2.name == content.board) {
+            boardTopics = this.pickTopics(item2.associations);
+          }
+        });
+      } else if (item.code === 'subject') {
+        item.terms.map((item2) => {
+          if (item2.name == content.subject) {
+            subjectTopics = this.pickTopics(item2.associations);
+          }
+        });
+      } else if (item.code === 'gradeLevel') {
+        item.terms.map((item2) => {
+          if (item2.name == content.gradeLevel) {
+            gradeTopics = this.pickTopics(item2.associations);
+          }
+        });
+      } else if (item.code === 'medium') {
+        item.terms.map((item2) => {
+          if (item2.name == content.medium) {
+            mediumTopics = this.pickTopics(item2.associations);
+          }
+        });
+      }
+    });
+    const finalarry = _.intersectionBy(this.topics, boardTopics, gradeTopics, subjectTopics, mediumTopics, 'identifier');
+    this.topics = finalarry;
+    this.topics.map((item) => {
+      item.expanded = false;
+      if (item.children.length) {
+        item.children.map((child) => {
+          child.expanded = false;
+        });
+      }
+    });
+    this.showPadagogySelector = true;
+  }
+
+  filterTopicListByUserSelction = (master, type) => {
+    const content = _.pickBy(this.formData.formInputData);
+    let arr = [];
+    master.terms.map((item) => {
+      if (item.name == content[type]) {
+        arr = this.pickTopics(item.associations);
+      }
+    });
+  }
+
+  pickTopics = (master) => {
+    const associatedTopics = [];
+    master.map((item) => {
+      if (item.category === 'topic') {
+        associatedTopics.push(item);
+      }
+    });
+    return associatedTopics;
+  }
+
+  moveToTopicSelection() {
+    this.showPadagogySelector = false;
     this.showTopicSelector = true;
   }
 }
