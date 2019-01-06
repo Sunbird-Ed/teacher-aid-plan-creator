@@ -1,67 +1,87 @@
-<div class="ui-segment">
-  <div class="ui grid" style="margin-top:10px;">
-    <div class="one wide column"></div>
-    <div class="ten wide stretched column">
-      <div class="ui segment">
-        <h3 class="ui header">
-          <i class="pencil alternate icon"></i>
-          <div class="content">
-            Teaching Method
-          </div>
-        </h3>
-        <form class="ui form">
-          <div class="content">
-            <div class="ui grid margin-bottom-15">
-              <div class="six wide column">
-                <div class="field">
-                  <label>
-                    Method Type
-                  </label>
+<div>
+  <div class="ui fixed main menu bs-0 main-header d-block">
+    <div class="ui container primary-header p-10">
+      <div role="banner" class="ui logo d-flex flex-ai-center">
+        <a class="d-flex flex-ai-center">
+          <img class="image centered cursor-pointer" alt="sunbird" src="assets/images/sunbird_logo.png">
+        </a>
+      </div>
+      <div (click)="goToPacks()" class="circular ui icon button">
+        <i class="close icon"></i>
+      </div>
+    </div>
+  </div>
+  <div class="ui p-20">
+    <div class="ui grid">
+      <div class="one wide column"></div>
+      <div class="ten wide stretched column">
+        <div class="ui segment">
+          <h3 class="ui header">
+            <i class="pencil alternate icon"></i>
+            <div class="content">
+              Teaching Method
+            </div>
+          </h3>
+          <form class="ui form">
+            <div class="content">
+              <div class="ui grid margin-bottom-15">
+                <div class="six wide column">
                   <div class="field">
-                    <sui-select id="methodType" name="methodTyoe" class="selection">
-                      <sui-select-option value="Method 1"></sui-select-option>
-                      <sui-select-option value="Method 2"></sui-select-option>
-                      <sui-select-option value="Method 3"></sui-select-option>
-                    </sui-select>
+                    <label>
+                      Method Type
+                    </label>
+                    <div class="field">
+                      <sui-select id="methodType" name="methodTyoe" class="selection" [(ngModel)]="methodDetails.selectedMethod">
+                        <sui-select-option *ngFor="let method of teachingMethodList" [value]="method.name"></sui-select-option>
+                      </sui-select>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="six wide column">
-                <div class="field">
-                  <label>
-                    Duration (Minutes)
-                  </label>
+                <div class="six wide column">
                   <div class="field">
-                    <input name="duration" placeholder="45 Minutes" type="number">
+                    <label>
+                      Duration (Minutes)
+                    </label>
+                    <div class="field">
+                      <input name="duration" [(ngModel)]="methodDetails.methodDuration" min="1" placeholder="45 Minutes"
+                        type="number">
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="twelve wide column">
-                <div class="field">
-                  <label>
-                    Short Description
-                  </label>
+                <div class="twelve wide column">
                   <div class="field">
-                    <input name="shortDescription" type="text">
+                    <label>
+                      Short Description
+                    </label>
+                    <div class="field">
+                      <input name="shortDescription" [(ngModel)]="methodDetails.methodDescription" type="text">
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div class="twelve wide column">
-                <div class="field">
-                  <label>
-                    Long Description
-                  </label>
+                <div class="twelve wide column">
                   <div class="field">
-                      <ckeditor [config]="config" [editor]="Editor" data="<p>Hello, world!</p>"></ckeditor>
+                    <label>
+                      Long Description
+                    </label>
+                    <div class="field margin-top-15">
+                      <ckeditor name="body" [config]="config" [editor]="Editor" [(ngModel)]="model.editorData"></ckeditor>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>  
+        <div class="ui">
+            <div class="actions actions margin-top-15">
+              <div (click)="createContent()" class="ui primary right floated  button">
+                <i class="cloud upload icon"></i>
+                Save
+              </div>
+            </div>
+          </div> 
       </div>
+      <div class="one wide column"></div>
     </div>
-    <div class="one wide column"></div>
   </div>
 </div>

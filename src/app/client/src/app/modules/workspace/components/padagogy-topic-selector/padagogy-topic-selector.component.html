@@ -1,6 +1,18 @@
 <sui-modal [isClosable]="true" [size]="'small'" [isFullScreen]="false" [mustScroll]="true" (dismissed)="goToTeachingPack(); "
   #modal>
+
   <div *ngIf="!showTopicSelector && !showPadagogySelector" class="ui segment mt-10">
+    <div class="ui">
+      <div class=" mb-15">
+        <div class="ui grid">
+          <div class="eleven wide column">
+            <span class="ui header">
+              Create Teching Pack
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
     <form class="ui form">
       <div class="content">
         <div *ngIf="formFieldProperties && categoryMasterList">
@@ -10,7 +22,7 @@
         </div>
         <div class="actions mt-10">
           <p class="text-align-center pt-20">
-            <button class="ui primary text-align-center icon button" (click)="createContent()">
+            <button class="ui primary text-align-center icon button" (click)="goToPedagogyScreen()">
               {{resourceService?.frmelmnts?.btn?.startcreating}}
             </button>
           </p>
@@ -37,7 +49,7 @@
             <b>{{ option.name }}</b>
           </div>
           <div class="ui horizontal bulleted list">
-            <li class="item" *ngFor="let data of option.pedagogyStep">{{ data }}</li>
+            <li class="item" *ngFor="let data of option.pedagogyStep">{{ data.name }}</li>
           </div>
         </ng-template>
         <sui-select class="selection fluid" [(ngModel)]="selectedFlow" [options]="padagogyList" labelField="name"
@@ -47,7 +59,7 @@
       </div>
     </div>
     <div class="actions">
-      <button (click)="moveToTopicSelection()" class="ui primary button">
+      <button (click)="goToTopicScreen()" [disabled]="!!!selectedFlow" class="ui primary button">
         Proceed
         <i class="right chevron icon"></i>
       </button>
@@ -60,7 +72,7 @@
           Select Topic
         </h6>
         <div class="topic-selector">
-          <tree-ngx [options]="treeOptions" (selectedItems)="selectedTopic = $event" [nodeItems]="topics">
+          <tree-ngx [options]="treeOptions" (selectedItems)="selecedItemsChanged($event)" [nodeItems]="topics">
             <ng-template #nodeCollapsibleTemplate let-expanded="expanded">
               <span *ngIf="expanded"><i class="minus square outline icon"></i></span>
               <span *ngIf="!expanded"><i class="plus square outline icon"></i></span>
@@ -70,10 +82,11 @@
       </div>
     </div>
     <div class="actions">
-      <button (click)="startCreating()" [disabled]="!selectedTopic?.length" class="ui primary button">
+      <button (click)="createContent()" [disabled]="!selectedTopic?.length" class="ui primary button">
         Proceed
         <i class="right chevron icon"></i>
       </button>
     </div>
   </ng-template>
+
 </sui-modal>

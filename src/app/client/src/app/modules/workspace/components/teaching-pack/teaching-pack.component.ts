@@ -255,7 +255,7 @@ export class TeachingPackComponent extends WorkSpace implements OnInit {
         subject: bothParams.queryParams.subject,
         medium: bothParams.queryParams.medium,
         gradeLevel: bothParams.queryParams.gradeLevel,
-        resourceType: bothParams.queryParams.resourceType
+        resourceType: ['Lesson Plan']
       },
       limit: limit,
       offset: (pageNumber - 1) * (limit),
@@ -331,32 +331,33 @@ export class TeachingPackComponent extends WorkSpace implements OnInit {
       return;
     }
     this.pageNumber = page;
-    this.route.navigate(['workspace/content/allcontent', this.pageNumber], { queryParams: this.queryParams });
+    this.route.navigate(['workspace/content/teachingpack', this.pageNumber], { queryParams: this.queryParams });
   }
 
   contentClick(content) {
-    if (_.size(content.lockInfo)) {
-      this.lockPopupData = content;
-      this.showLockedContentModal = true;
-    } else {
-      const status = content.status.toLowerCase();
-      if (status !== 'processing') {
-        // only draft state contents need to be locked
-        if (status === 'draft') {
-          this.lockContent(content).subscribe(
-            (data: ServerResponse) => {
-              content.lock = data.result;
-              this.workSpaceService.navigateToContent(content, this.state);
-            },
-            (err: ServerResponse) => {
-              this.toasterService.error(this.resourceService.messages.fmsg.m0006);
-            }
-          );
-        } else {
-          this.workSpaceService.navigateToContent(content, this.state);
-        }
-      }
-    }
+    this.route.navigate(['workspace/new/teachingpack/', content.identifier]);
+    // if (_.size(content.lockInfo)) {
+    //   this.lockPopupData = content;
+    //   this.showLockedContentModal = true;
+    // } else {
+    //   const status = content.status.toLowerCase();
+    //   if (status !== 'processing') {
+    //     // only draft state contents need to be locked
+    //     if (status === 'draft') {
+    //       this.lockContent(content).subscribe(
+    //         (data: ServerResponse) => {
+    //           content.lock = data.result;
+    //           this.workSpaceService.navigateToContent(content, this.state);
+    //         },
+    //         (err: ServerResponse) => {
+    //           this.toasterService.error(this.resourceService.messages.fmsg.m0006);
+    //         }
+    //       );
+    //     } else {
+    //       this.workSpaceService.navigateToContent(content, this.state);
+    //     }
+    //   }
+    // }
   }
 
   public onCloseLockInfoPopup() {

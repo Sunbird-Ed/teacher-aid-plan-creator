@@ -1,25 +1,28 @@
 
-import { Component, OnInit, ViewChild, OnDestroy, AfterContentInit } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FrameworkService } from '@sunbird/core';
 import { ToasterService, ResourceService, Framework } from '@sunbird/shared';
 import { PublicDataService, SearchService, FormService, UserService } from '@sunbird/core';
-import { ConfigService, ServerResponse } from '@sunbird/shared';
+import { ConfigService, ServerResponse, IUserData, IUserProfile } from '@sunbird/shared';
 import * as _ from 'lodash';
 import { CacheService } from 'ng2-cache-service';
 import { DefaultTemplateComponent } from '../content-creation-default-template/content-creation-default-template.component';
 import { TreeMode } from 'tree-ngx';
+import { EditorService } from './../../services';
 @Component({
   selector: 'app-padagogy-topic-selector',
   templateUrl: './padagogy-topic-selector.component.html',
   styleUrls: ['./padagogy-topic-selector.component.css']
 })
-export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterContentInit {
+export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
   @ViewChild('modal') modal;
   @ViewChild('formData') formData: DefaultTemplateComponent;
   public frameworkService: FrameworkService;
   public framework: string;
   private searchService: SearchService;
+  private editorService: EditorService;
+  public userProfile: IUserProfile;
   /**
   * To show toaster(error, success etc) after any API calls
   */
@@ -53,8 +56,7 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
 
   public formFieldProperties: any;
   public frameworkData: object;
-
-  public selectedTopic: any[];
+  public selectedTopic = [];
 
   constructor(
     activatedRoute: ActivatedRoute,
@@ -67,7 +69,8 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
     configService: ConfigService,
     formService: FormService,
     private _cacheService: CacheService,
-    private userService: UserService
+    private userService: UserService,
+    editorService: EditorService,
   ) {
     this.frameworkService = frameworkService;
     this.toasterService = toasterService;
@@ -77,25 +80,36 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
     this.searchService = searchService;
     this.formService = formService;
     this.contentType = 'teachingaid';
+    this.editorService = editorService;
+    this.userService = userService;
   }
   filterData: any;
   topics = [];
   padagogyList = [];
+  pedagogyStepList = [];
   selectedFlow: any;
   showTopicSelector: boolean;
   showPadagogySelector: boolean;
+  formContent: any;
   treeOptions = {
     mode: TreeMode.SingleSelect,
     checkboxes: false,
-    alwaysEmitSelected: true,
-    expande: false
+    alwaysEmitSelected: true
   };
+  copyDeep = [];
   ngOnInit() {
     this.frameworkService.initialize();
     this.fetchFrameworkMetaData();
+    this.userService.userData$.subscribe(
+      (user: IUserData) => {
+        if (user && !user.err) {
+          this.userProfile = user.userProfile;
+        }
+      });
   }
-  ngAfterContentInit() {
-    // this.fetchFrameworkMetaData();
+
+  public selecedItemsChanged(item) {
+    this.selectedTopic = item;
   }
 
   ngOnDestroy() {
@@ -103,6 +117,7 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
       this.modal.deny();
     }
   }
+
 
   fetchFrameworkMetaData() {
 
@@ -139,12 +154,17 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
           if (item.code === 'topic') {
             this.topics = item.terms;
           }
+          if (item.code === 'pedagogyFlow') {
+            this.padagogyList = item.terms;
+          }
+          if (item.code === 'pedagogyStep') {
+            this.pedagogyStepList = item.terms;
+          }
         });
       } else if (frameworkData && frameworkData.err) {
         this.toasterService.error(this.resourceService.messages.emsg.m0005);
       }
     });
-    console.log('category master ', this.categoryMasterList);
   }
 
   getFormConfig() {
@@ -168,11 +188,31 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
     this.router.navigate(['workspace/content/teachingpack', 1]);
   }
 
-  startCreating() {
-    this.router.navigate(['workspace/new/teachingpack', 'do_12343324']);
+  // startCreating() {
+  //   this.router.navigate(['workspace/new/teachingpack', 'do_12343324']);
+  // }
+
+  goToPedagogyScreen() {
+    this.filterTopics();
+    this.padagogyList.map((item) => {
+      item['pedagogyStep'] = [];
+      item.associations = _.intersectionBy(this.pedagogyStepList, item.associations, 'identifier');
+      item.associations.map((step) => {
+        if (step.category === 'pedagogyStep') {
+          item['pedagogyStep'].push(step);
+        }
+      });
+    });
+    this.showPadagogySelector = true;
   }
-  createContent() {
+
+  goToTopicScreen() {
+    this.showPadagogySelector = false;
+    this.showTopicSelector = true;
+  }
+  filterTopics() {
     const content = _.pickBy(this.formData.formInputData);
+    this.formContent = _.pickBy(this.formData.formInputData);
     const temp = [];
     let boardTopics = [];
     let subjectTopics = [];
@@ -209,13 +249,20 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
     this.topics = finalarry;
     this.topics.map((item) => {
       item.expanded = false;
-      if (item.children.length) {
+      item.item = item.name;
+      if (item.children && item.children.length) {
         item.children.map((child) => {
           child.expanded = false;
+          child.item = child.name;
+          if (child.children && child.children.length) {
+            child.children.map((gchild) => {
+              gchild.item = gchild.name;
+            });
+          }
         });
       }
     });
-    this.showPadagogySelector = true;
+
   }
 
   filterTopicListByUserSelction = (master, type) => {
@@ -238,9 +285,38 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy, AfterC
     return associatedTopics;
   }
 
-  moveToTopicSelection() {
-    this.showPadagogySelector = false;
-    this.showTopicSelector = true;
+  createContent() {
+    const requestData = {
+      content: this.generateData(this.formContent)
+    };
+    this.editorService.create(requestData).subscribe(res => {
+      this.router.navigate(['workspace/new/teachingpack', res.result.content_id]);
+    }, err => {
+      this.toasterService.error(this.resourceService.messages.fmsg.m0010);
+    });
+  }
+
+  generateData(data) {
+    // this.showLoader = true;
+    const requestData = _.cloneDeep(data);
+    requestData['gradeLevel'] = [requestData['gradeLevel']];
+    requestData['name'] = 'Untitled',
+      requestData['description'] = '',
+      requestData['createdBy'] = this.userProfile.id,
+      requestData['organisation'] = this.userProfile.organisationNames,
+      requestData['createdFor'] = this.userProfile.organisationIds,
+      requestData['contentType'] = 'LessonPlan',
+      requestData['framework'] = this.framework;
+    requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
+    requestData['topics'] = this.selectedTopic[0];
+    requestData['pedagogySteps'] = this.selectedFlow['pedagogyStep'];
+    requestData['resourceType'] = 'Lesson Plan';
+    if (!_.isEmpty(this.userProfile.lastName)) {
+      requestData['creator'] = this.userProfile.firstName + ' ' + this.userProfile.lastName;
+    } else {
+      requestData['creator'] = this.userProfile.firstName;
+    }
+    return requestData;
   }
 }
 

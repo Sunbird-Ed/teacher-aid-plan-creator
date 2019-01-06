@@ -21,7 +21,7 @@
     "RESOURCEBUNDLES": {
       "ENG": "/read"
     },
-    "REVIEW_COMMENT":{
+    "REVIEW_COMMENT": {
       "READ": "review/comment/v1/read/comment",
       "DELETE": "review/comment/v1/delete/comment",
       "CREATE": "review/comment/v1/create/comment"
@@ -43,8 +43,8 @@
     "COMPOSITE": {
       "SEARCH": "composite/v1/search"
     },
-    "SYSTEM_SETTING":{
-      "CUSTODIAN_ORG":"data/v1/system/settings/get/custodianOrgId"
+    "SYSTEM_SETTING": {
+      "CUSTODIAN_ORG": "data/v1/system/settings/get/custodianOrgId"
     },
     "COURSE": {
       "SEARCH": "course/v1/search",
@@ -54,7 +54,7 @@
       "GET_ENROLLED_COURSES": "course/v1/user/enrollment/list",
       "ENROLL_USER_COURSE": "course/v1/enrol",
       "RECOMMENDED_COURSE": "recommended/courses",
-      "UNENROLL_USER_COURSE":"course/v1/unenrol"
+      "UNENROLL_USER_COURSE": "course/v1/unenrol"
     },
     "CONTENT": {
       "SEARCH": "content/v1/search",
@@ -70,7 +70,9 @@
       "COPY": "content/v1/copy",
       "LOCK_LIST": "lock/v1/list",
       "LOCK_CREATE": "lock/v1/create",
-      "LOCK_RETIRE": "lock/v1/retire"
+      "LOCK_RETIRE": "lock/v1/retire",
+      "UPDATE": "content/v1/update",
+      "UPDATE_HIERARCHY": "content/v3/hierarchy/update"
     },
     "DASHBOARD": {
       "ORG_CREATION": "dashboard/v1/creation/org",

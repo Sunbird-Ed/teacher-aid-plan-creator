@@ -5,7 +5,7 @@ import { WorkspaceRoutingModule } from './workspace-routing.module';
 import { SharedModule } from '@sunbird/shared';
 import { SuiModule } from 'ng2-semantic-ui/dist';
 import { FormsModule, ReactiveFormsModule, } from '@angular/forms';
-import { WorkSpaceService, EditorService , BatchService, ReviewCommentsService} from './services';
+import { WorkSpaceService, EditorService , BatchService, ReviewCommentsService, TeachingPackService} from './services';
 import {
   WorkspaceComponent, CreateContentComponent, DraftComponent,
   ReviewSubmissionsComponent, PublishedComponent, UploadedComponent,
@@ -64,6 +64,6 @@ import { TreeNgxModule } from 'tree-ngx';
     CreateTeachingPackComponent,
     CreateTeachingMethodComponent
   ],
-  providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService]
+  providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService, TeachingPackService]
 })
 export class WorkspaceModule { }
