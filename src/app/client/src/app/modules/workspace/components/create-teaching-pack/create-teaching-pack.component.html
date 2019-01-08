@@ -53,7 +53,31 @@
                   </div>
                 </div>
               </form>
-              <div class="ui grid">
+              <div class="ui cards stepcards">
+                <div class="card" *ngFor="let step of padagogySteps">
+                  <div class="content">
+                    <div class="header">
+                      <p>{{step.name}}</p>
+                    </div>
+                    <div class="meta">
+                      <p>{{step.info?.methodtype}}</p>
+                    </div>
+                    <div class="description">
+                      <p>
+                        {{step.info?.description | slice:0:60}}
+                        <i *ngIf="step.info?.description.length > 60">...</i>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="ui bottom attached button" (click)="addNewMethod(step)">
+                    <i *ngIf="!!!step.info?.identifier" class="add icon"></i>
+                    <i *ngIf="!!step.info?.identifier" class="edit icon"></i>
+                    {{step.info?.identifier ? 'Edit Method' : 'Add Method' }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- <div class="ui grid">
                 <div class="four wide column" *ngFor="let step of padagogySteps">
                   <div class="ui card" [ngClass]="{'green' : step.hasMethod }">
                     <div class="ui sub header content">
@@ -66,13 +90,13 @@
                         <div class="ui bottom attached button" (click)="addNewMethod(step.name, step.hasMethod)">
                           <i *ngIf="!step.hasMethod" class="add icon"></i>
                           <i *ngIf="step.hasMethod" class="edit icon"></i>
-                          {{step.hasMethod ? 'Edit Method' : 'Add Method' }}
+                          {{step.info?.identifier ? 'Edit Method' : 'Add Method' }}
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
               <div class="actions actions margin-top-15">
                 <div (click)="updatePlanMetaData()" class="ui primary right floated  button">
                   <i class="cloud upload icon"></i>

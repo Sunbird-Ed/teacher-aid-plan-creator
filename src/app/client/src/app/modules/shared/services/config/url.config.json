@@ -72,7 +72,8 @@
       "LOCK_CREATE": "lock/v1/create",
       "LOCK_RETIRE": "lock/v1/retire",
       "UPDATE": "content/v1/update",
-      "UPDATE_HIERARCHY": "content/v3/hierarchy/update"
+      "UPDATE_HIERARCHY": "content/v3/hierarchy/update",
+      "GET_HIERARCHY":"action/content/v3/hierarchy"
     },
     "DASHBOARD": {
       "ORG_CREATION": "dashboard/v1/creation/org",

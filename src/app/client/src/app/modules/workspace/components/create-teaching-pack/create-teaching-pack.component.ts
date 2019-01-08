@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EditorService } from './../../services';
 import { ContentService, PublicDataService, UserService } from '@sunbird/core';
 import { ConfigService, ServerResponse, IUserProfile, IUserData } from '@sunbird/shared';
+import { TeachingPackService } from '../../services';
 import * as _ from 'lodash';
 // import { ConfigService } from 'src/app/modules/shared';
 @Component({
@@ -20,6 +21,7 @@ export class CreateTeachingPackComponent implements OnInit {
     public publicDataService: PublicDataService,
     public configService: ConfigService,
     private userService: UserService,
+    public teachingPackService: TeachingPackService
   ) { }
   padagogyFlow: any;
   contentId: string;
@@ -29,6 +31,7 @@ export class CreateTeachingPackComponent implements OnInit {
   padagogySteps = [];
   topicName: string;
   showLoader = true;
+  planChildrens = [];
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.contentId = params['contentId'];
@@ -46,16 +49,28 @@ export class CreateTeachingPackComponent implements OnInit {
     const options: any = { params: {} };
     // options.params.mode = 'edit';
     const req = {
-      url: `${this.configService.urlConFig.URLS.CONTENT.GET}/${this.contentId}`,
-      param: {}
+      url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.contentId}`,
+      param: { mode: 'edit' }
     };
-    this.publicDataService.get(req).subscribe((res) => {
+    this.teachingPackService.get(req).subscribe((res) => {
       this.showLoader = false;
       this.collectionDetails = res.result.content;
       this.lessonName = this.collectionDetails['name'];
       this.lessonDescription = this.collectionDetails['description'];
       this.topicName = this.collectionDetails['topics'];
       this.padagogySteps = JSON.parse(this.collectionDetails['pedagogySteps']);
+      const children = _.filter(this.collectionDetails['children'], ['contentType', 'TeachingMethod']);
+      _.forEach(this.padagogySteps, (item) => {
+        _.forEach(children, (item2) => {
+          if (item.name === item2.pedagogyStep) {
+            item['info'] = item2;
+          }
+        });
+      });
+      _.forEach(children, (item2) => {
+        this.planChildrens.push(item2.identifier);
+      });
+      console.log('this.padagogySteps', this.planChildrens);
     });
   }
 
@@ -68,7 +83,6 @@ export class CreateTeachingPackComponent implements OnInit {
           content: {
             name: this.lessonName,
             description: this.lessonDescription,
-            pedagogySteps: this.padagogySteps,
             versionKey: this.collectionDetails['versionKey']
           }
         }
@@ -86,32 +100,47 @@ export class CreateTeachingPackComponent implements OnInit {
     });
   }
 
-  addNewMethod(stepName, hasMethod) {
-    if (hasMethod) {
-      const methodId = _.find(this.padagogySteps, ['name', stepName]).methodId;
+  addNewMethod(step) {
+    if (!!step.info && !!step.info.identifier) {
+      const methodId = step.info.identifier;
       this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod'],
         { queryParams: { methodId: methodId } });
     } else {
       const requestData = {
-        content: this.generateData(stepName)
+        content: this.generateData(step.name)
       };
       this.editorService.create(requestData).subscribe(res => {
-        this.padagogySteps.map((item) => {
-          if (item.name === stepName) {
-            item['hasMethod'] = true;
-            item['methodId'] = res.result.content_id;
-          }
-        });
-        this.updatePlanMetaData(true, res.result.content_id);
-        // this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod']);
+        this.planChildrens.push(res.result.content_id);
+        this.updateLessonPlanHierarchy(res.result.content_id);
       }, err => {
-        // this.toasterService.error(this.resourceService.messages.fmsg.m0010);
       });
     }
-
-    // this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod']);
   }
 
+  updateLessonPlanHierarchy(methodId) {
+    const req = {
+      url: `action/${this.configService.urlConFig.URLS.CONTENT.UPDATE_HIERARCHY}`,
+      data: {
+        'request': {
+          data: {
+            nodesModified: {},
+            hierarchy: {
+              [this.contentId]: {
+                'contentType': 'LessonPlan',
+                children: this.planChildrens,
+                root: true
+              }
+            }
+          }
+        }
+      }
+    };
+    this.teachingPackService.patch(req).subscribe((res) => {
+      console.log('sadasds');
+      this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod'],
+        { queryParams: { methodId: methodId } });
+    });
+  }
   goToPacks() {
     this.router.navigate(['workspace/content/teachingpack', 1]);
   }

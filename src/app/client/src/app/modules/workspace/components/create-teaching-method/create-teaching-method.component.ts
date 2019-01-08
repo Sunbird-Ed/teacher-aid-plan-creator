@@ -5,7 +5,9 @@ import { ConfigService, ServerResponse, ResourceService, IUserData, IUserProfile
 import { PublicDataService, SearchService, FormService, UserService } from '@sunbird/core';
 import { EditorService } from './../../services';
 import { TeachingPackService } from '../../services';
+import { MyUploadAdapter } from './file-uploader';
 import * as _ from 'lodash';
+import { from } from 'rxjs';
 @Component({
   selector: 'app-create-teaching-method',
   templateUrl: './create-teaching-method.component.html',
@@ -13,7 +15,9 @@ import * as _ from 'lodash';
 })
 export class CreateTeachingMethodComponent implements OnInit {
 
-  public Editor = ClassicEditor;
+  public Editor: ClassicEditor = ClassicEditor;
+  public myUploadAdapter: MyUploadAdapter;
+
   public userProfile: IUserProfile;
   public framework: string;
   public configService: ConfigService;
@@ -380,7 +384,7 @@ export class CreateTeachingMethodComponent implements OnInit {
       'name': 'Wrapping up'
     }
   ];
-
+  editorinstance: any;
   public config = {
     toolbar: {
       viewportTopOffset: 30
@@ -403,85 +407,11 @@ export class CreateTeachingMethodComponent implements OnInit {
           this.userProfile = user.userProfile;
         }
       });
+    this.create();
   }
 
   createContent() {
-    // const requestData = {
-    //   content: this.generateData()
-    // };
-    // this.editorService.create(requestData).subscribe(res => {
-    //   console.log('teaching method created', res);
-    //   // this.updateHirarchy(res.result);
-    //   this.router.navigate(['workspace/new/teachingpack', this.contentId]);
-    // }, err => {
-    //   this.toasterService.error(this.resourceService.messages.fmsg.m0010);
-    // });
     this.updatePlanMetaData();
-  }
-
-  generateData() {
-    // this.showLoader = true;
-    const requestData = {};
-    requestData['name'] = 'Untitled',
-      requestData['duration'] = this.methodDetails.methodDuration.toString(),
-      requestData['description'] = this.methodDetails.methodDescription,
-      requestData['createdBy'] = this.userProfile.id,
-      requestData['type'] = this.methodDetails.selectedMethod,
-      requestData['organisation'] = this.userProfile.organisationNames,
-      requestData['createdFor'] = this.userProfile.organisationIds,
-      requestData['contentType'] = 'TeachingMethod',
-      requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
-    // requestData['resourceType'] = 'Lesson Plan';
-    requestData['body'] = this.model.editorData;
-    if (!_.isEmpty(this.userProfile.lastName)) {
-      requestData['creator'] = this.userProfile.firstName + ' ' + this.userProfile.lastName;
-    } else {
-      requestData['creator'] = this.userProfile.firstName;
-    }
-    return requestData;
-  }
-
-  updateHirarchy(newnode) {
-    const requestData = {
-      data: {
-        nodesModified: {
-          [newnode['content_id']]: {
-            isNew: true,
-            root: false,
-            metadata: {
-              name: 'Untitled',
-              contentType: 'TeachingMethod'
-            }
-          }
-        },
-        hierarchy: {
-          [this.contentId]: {
-            root: true,
-            children: [
-              newnode['content_id']
-            ]
-          },
-          [newnode['content_id']]: {
-            root: false,
-            children: []
-          }
-        }
-      }
-    };
-    const req = {
-      url: `action/${this.configService.urlConFig.URLS.CONTENT.UPDATE_HIERARCHY}`,
-      data: {
-        'request': {
-          data: requestData.data
-        }
-      }
-    };
-    // this.publicDataService.patch(req).subscribe((res) => {
-    //   console.log('responsee  das asd ads update', res);
-    // });
-    this.teachingPackService.patch(req).subscribe((res) => {
-      console.log('sadasds');
-    });
   }
 
   goToPacks() {
@@ -493,18 +423,15 @@ export class CreateTeachingMethodComponent implements OnInit {
     // options.params.mode = 'edit';
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET}/${this.methodId}`,
-      param: {}
+      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description' }
     };
     this.publicDataService.get(req).subscribe((res) => {
-      // this.showLoader = false;
       this.collectionDetails = res.result.content;
       this.methodDetails.methodDuration = this.collectionDetails['duration'];
       this.methodDetails.methodDescription = this.collectionDetails['description'];
       this.methodDetails.selectedMethod = this.collectionDetails['methodtype'];
       this.model.editorData = this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
-      // this.lessonName = this.collectionDetails['name'];
-      // this.lessonDescription = this.collectionDetails['description'];
-      // this.padagogySteps = JSON.parse(this.collectionDetails['pedagogySteps']);
+      this.editorinstance.setData(this.collectionDetails['body']);
     });
   }
 
@@ -516,7 +443,7 @@ export class CreateTeachingMethodComponent implements OnInit {
           content: {
             duration: this.methodDetails.methodDuration.toString(),
             description: this.methodDetails.methodDescription,
-            body: this.model.editorData,
+            body: this.editorinstance.getData(),
             methodtype: this.methodDetails.selectedMethod,
             versionKey: this.collectionDetails['versionKey']
           }
@@ -529,4 +456,20 @@ export class CreateTeachingMethodComponent implements OnInit {
       }, 2000);
     });
   }
+
+  create() {
+    this.Editor.create(document.querySelector('#editor'), {
+      extraPlugins: [this.MyCustomUploadAdapterPlugin]
+    }).then((editorinstance) => {
+      this.editorinstance = editorinstance;
+    });
+  }
+
+  MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+      // Configure the URL to the upload script in your back-end here!
+      return new MyUploadAdapter(loader, 'https://staging.open-sunbird.org/action/content/v3/upload/do_21267211063479500813877');
+    };
+  }
+
 }
