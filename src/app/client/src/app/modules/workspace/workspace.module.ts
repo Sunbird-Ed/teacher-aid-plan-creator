@@ -6,6 +6,7 @@ import { SharedModule } from '@sunbird/shared';
 import { SuiModule } from 'ng2-semantic-ui/dist';
 import { FormsModule, ReactiveFormsModule, } from '@angular/forms';
 import { WorkSpaceService, EditorService , BatchService, ReviewCommentsService, TeachingPackService} from './services';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {
   WorkspaceComponent, CreateContentComponent, DraftComponent,
   ReviewSubmissionsComponent, PublishedComponent, UploadedComponent,
@@ -39,7 +40,8 @@ import { TreeNgxModule } from 'tree-ngx';
     TelemetryModule,
     OrderModule,
     CKEditorModule,
-    TreeNgxModule
+    TreeNgxModule,
+    InfiniteScrollModule
   ],
   declarations: [WorkspaceComponent, WorkspacesidebarComponent,
     CreateContentComponent, DraftComponent, ReviewSubmissionsComponent,

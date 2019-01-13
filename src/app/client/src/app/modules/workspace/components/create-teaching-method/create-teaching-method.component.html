@@ -1,88 +1,200 @@
-<div>
-  <div class="ui fixed main menu bs-0 main-header d-block">
-    <div class="ui container primary-header p-10">
-      <div role="banner" class="ui logo d-flex flex-ai-center">
-        <a class="d-flex flex-ai-center">
-          <img class="image centered cursor-pointer" alt="sunbird" src="assets/images/sunbird_logo.png">
-        </a>
-      </div>
-      <div (click)="goToPacks()" class="circular ui icon button">
-        <i class="close icon"></i>
-      </div>
+<div class="ui fixed main menu bs-0 main-header d-block">
+  <div class="ui container primary-header p-10">
+    <div role="banner" class="ui logo d-flex flex-ai-center">
+      <a class="d-flex flex-ai-center">
+        <img class="image centered cursor-pointer" alt="sunbird" src="assets/images/sunbird_logo.png">
+      </a>
+    </div>
+    <div (click)="goToPacks()" class="circular ui icon button">
+      <i class="close icon"></i>
     </div>
   </div>
-  <div class="ui p-20">
-    <div class="ui grid">
-      <div class="one wide column"></div>
-      <div class="ten wide stretched column">
-        <div class="ui segment">
-          <h3 class="ui header">
-            <i class="pencil alternate icon"></i>
-            <div class="content">
-              Teaching Method
-            </div>
-          </h3>
-          <form class="ui form">
-            <div class="content">
-              <div class="ui grid margin-bottom-15">
-                <div class="six wide column">
-                  <div class="field">
-                    <label>
-                      Method Type
-                    </label>
-                    <div class="field">
-                      <sui-select id="methodType" name="methodTyoe" class="selection" [(ngModel)]="methodDetails.selectedMethod">
-                        <sui-select-option *ngFor="let method of teachingMethodList" [value]="method.name"></sui-select-option>
-                      </sui-select>
-                    </div>
-                  </div>
-                </div>
-                <div class="six wide column">
-                  <div class="field">
-                    <label>
-                      Duration (Minutes)
-                    </label>
-                    <div class="field">
-                      <input name="duration" [(ngModel)]="methodDetails.methodDuration" min="1" placeholder="45 Minutes"
-                        type="number">
-                    </div>
-                  </div>
-                </div>
-                <div class="twelve wide column">
-                  <div class="field">
-                    <label>
-                      Short Description
-                    </label>
-                    <div class="field">
-                      <input name="shortDescription" [(ngModel)]="methodDetails.methodDescription" type="text">
-                    </div>
-                  </div>
-                </div>
-                <div class="twelve wide column">
-                  <div class="field">
-                    <label>
-                      Long Description
-                    </label>
-                    <div class="field margin-top-15">
-                      <div id="editor"></div> 
-                      <!-- <ckeditor id="editor" name="body" [config]="config" [editor]="Editor" [(ngModel)]="model.editorData"></ckeditor> -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>  
+</div>
+<div class="ui p-20">
+  <div class="ui grid">
+    <div class="one wide column"></div>
+    <div class="ten wide stretched column">
         <div class="ui">
             <div class="actions actions margin-top-15">
               <div (click)="createContent()" class="ui primary right floated  button">
                 <i class="cloud upload icon"></i>
                 Save
               </div>
+              <div (click)="initializeResoursePicker()" class="ui primary right floated  button">
+                Add Resourse
+              </div>
             </div>
-          </div> 
+          </div>
+      <div class="ui segment">
+        <h3 class="ui header">
+          <i class="pencil alternate icon"></i>
+          <div class="content">
+            Teaching Method
+          </div>
+        </h3>
+        <form class="ui form">
+          <div class="content">
+            <div class="ui grid margin-bottom-15">
+              <div class="six wide column">
+                <div class="field">
+                  <label>
+                    Method Type
+                  </label>
+                  <div class="field">
+                    <sui-select id="methodType" name="methodTyoe" class="selection" [(ngModel)]="methodDetails.selectedMethod">
+                      <sui-select-option *ngFor="let method of teachingMethodList" [value]="method.name"></sui-select-option>
+                    </sui-select>
+                  </div>
+                </div>
+              </div>
+              <div class="six wide column">
+                <div class="field">
+                  <label>
+                    Duration (Minutes)
+                  </label>
+                  <div class="field">
+                    <input name="duration" [(ngModel)]="methodDetails.methodDuration" min="1" placeholder="45 Minutes"
+                      type="number">
+                  </div>
+                </div>
+              </div>
+              <div class="twelve wide column">
+                <div class="field">
+                  <label>
+                    Short Description
+                  </label>
+                  <div class="field">
+                    <input name="shortDescription" [(ngModel)]="methodDetails.methodDescription" type="text">
+                  </div>
+                </div>
+              </div>
+              <div class="twelve wide column">
+                <div class="field">
+                  <label>
+                    Long Description
+                  </label>
+                  <div class="field margin-top-15">
+                    <div id="editor"></div>
+                    <!-- <ckeditor id="editor" name="body" [config]="config" [editor]="Editor" [(ngModel)]="model.editorData"></ckeditor> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
-      <div class="one wide column"></div>
+      <div class="ui stacked segments" *ngIf="associatedResources.length > 0">
+        <div class="ui segment">
+          <h2 class="ui header">Resourses</h2>
+        </div>
+        <div *ngFor="let resource of associatedResources" class="ui raised segment">
+          <div class="ui grid">
+            <div class="two wide column">
+              <img class="ui small image" [src]="resource.appIcon ? resource.appIcon : 'assets/images/default.png'">
+            </div>
+            <div class="eight wide column">
+              <h3 class="ui header">{{resource.name}}
+              </h3>
+              <div class="content">
+                {{resource.description}}
+              </div>
+            </div>
+            <div class="two wide column remove-icon">
+              <a (click)="removeResource(resource)" class="ui label">
+                <i class="trash icon"></i> Remove
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+     
     </div>
+    <div class="one wide column"></div>
   </div>
 </div>
+
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissResoursePicker()" *ngIf="showResoursePicker"
+  [size]="'large'" [isFullScreen]="false" [mustScroll]="true" #modal2>
+  <div class="header">Add Resourse</div>
+  <div class="scrolling content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="500"
+    [scrollWindow]="false" (scrolled)="lazyloadResources()">
+    <div class="ui four cards">
+      <div *ngFor="let data of myAssets" [ngClass]="{'green' : data.selected}" class="ui card resource-card">
+        <div (click)="selectResourse(data)" class="ui slide masked reveal image">
+          <img [src]="data.appIcon ? data.appIcon : 'assets/images/default.png'" class="visible content resource-image">
+          <div class="hidden content resource-hidden-content">
+            <div class="ui middle aligned divided list">
+              <div class="item">
+                <div class="right floated content">
+                  {{data.board}}
+                </div>
+                <div class="content">
+                  Board 
+                </div>
+              </div>
+              <div class="item">
+                <div class="right floated content">
+                  {{data.gradeLevel?.join()}}
+                </div>
+                <div class="content">
+                  Class
+                </div>
+              </div>
+              <div class="item">
+                <div class="right floated content">
+                  {{data.subject}}
+                </div>
+                <div class="content">
+                  Subject
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content">
+          <a class="header">{{data.name}}</a>
+          <div class="meta">
+            <span class="date">{{data.description | slice:0:200}}</span>
+            <span class="date" *ngIf="data.description?.length > 200">...</span>
+          </div>
+        </div>
+        <!-- <div class="extra content">
+          <a>
+            {{data.creator}}
+          </a>
+        </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui buttons">
+      <button (click)="modal2.deny()" class="ui button">Cancel</button>
+      <div class="or"></div>
+      <button (click)="addResources();modal2.deny()" class="ui primary button">Save</button>
+    </div>
+  </div>
+</sui-modal>
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissResoursePicker()" *ngIf="false" [size]="'normal'"
+  [isFullScreen]="false" [mustScroll]="true" #modal>
+  <div class="header">Header</div>
+  <div class="scrolling content">
+    <sui-tabset>
+      <div class="ui tabular menu">
+        <a class="item" suiTabHeader="1">My Images</a>
+        <a class="item" suiTabHeader="2">All Image</a>
+      </div>
+      <div class="ui segment" suiTabContent="1">
+        <div class="ui small middle aligned bordered images custom-image">
+          <img *ngFor="let data of myAssets" [src]="data.artifactUrl">
+        </div>
+      </div>
+      <div class="ui segment" suiTabContent="2">Second nested tab!</div>
+    </sui-tabset>
+  </div>
+  <div class="actions">
+    <div class="ui approve button">Approve</div>
+    <div class="ui button">Neutral</div>
+    <div class="ui cancel button">Cancel</div>
+  </div>
+</sui-modal>

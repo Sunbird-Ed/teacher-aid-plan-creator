@@ -41,7 +41,8 @@
       "CREATE_V2": "user/v2/create"
     },
     "COMPOSITE": {
-      "SEARCH": "composite/v1/search"
+      "SEARCH": "composite/v1/search",
+      "SEARCHV3":"action/composite/v3/search"
     },
     "SYSTEM_SETTING": {
       "CUSTODIAN_ORG": "data/v1/system/settings/get/custodianOrgId"
@@ -73,7 +74,9 @@
       "LOCK_RETIRE": "lock/v1/retire",
       "UPDATE": "content/v1/update",
       "UPDATE_HIERARCHY": "content/v3/hierarchy/update",
-      "GET_HIERARCHY":"action/content/v3/hierarchy"
+      "GET_HIERARCHY": "action/content/v3/hierarchy",
+      "CREATE_CONTENT": "action/content/v3/create",
+      "UPLOAD_IMAGE": "action/content/v3/upload"
     },
     "DASHBOARD": {
       "ORG_CREATION": "dashboard/v1/creation/org",

@@ -70,7 +70,6 @@ export class CreateTeachingPackComponent implements OnInit {
       _.forEach(children, (item2) => {
         this.planChildrens.push(item2.identifier);
       });
-      console.log('this.padagogySteps', this.planChildrens);
     });
   }
 
@@ -136,7 +135,6 @@ export class CreateTeachingPackComponent implements OnInit {
       }
     };
     this.teachingPackService.patch(req).subscribe((res) => {
-      console.log('sadasds');
       this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod'],
         { queryParams: { methodId: methodId } });
     });
@@ -154,6 +152,10 @@ export class CreateTeachingPackComponent implements OnInit {
       requestData['createdFor'] = this.userProfile.organisationIds,
       requestData['contentType'] = 'TeachingMethod',
       requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
+      requestData['board'] = this.collectionDetails['board'];
+      requestData['gradeLevel'] = this.collectionDetails['gradeLevel'];
+      requestData['subject'] = this.collectionDetails['subject'];
+      requestData['medium'] = this.collectionDetails['medium'];
     if (!_.isEmpty(this.userProfile.lastName)) {
       requestData['creator'] = this.userProfile.firstName + ' ' + this.userProfile.lastName;
     } else {

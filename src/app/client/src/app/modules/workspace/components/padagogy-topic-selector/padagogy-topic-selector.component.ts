@@ -213,43 +213,58 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
   filterTopics() {
     const content = _.pickBy(this.formData.formInputData);
     this.formContent = _.pickBy(this.formData.formInputData);
-    const temp = [];
     let boardTopics = [];
     let subjectTopics = [];
     let gradeTopics = [];
     let mediumTopics = [];
     this.categoryMasterList.map((item) => {
       if (item.code === 'board') {
-        item.terms.map((item2) => {
-          if (item2.name == content.board) {
-            boardTopics = this.pickTopics(item2.associations);
-          }
-        });
+        if (!!content.board) {
+          item.terms.map((item2) => {
+            if (item2.name === content.board) {
+              boardTopics = this.pickTopics(item2.associations);
+            }
+          });
+        } else {
+            boardTopics = [...this.topics];
+        }
       } else if (item.code === 'subject') {
-        item.terms.map((item2) => {
-          if (item2.name == content.subject) {
-            subjectTopics = this.pickTopics(item2.associations);
-          }
-        });
+        if (!!content.subject) {
+          item.terms.map((item2) => {
+            if (item2.name === content.subject) {
+              subjectTopics = this.pickTopics(item2.associations);
+            }
+          });
+        } else {
+          subjectTopics = [...this.topics];
+        }
       } else if (item.code === 'gradeLevel') {
-        item.terms.map((item2) => {
-          if (item2.name == content.gradeLevel) {
-            gradeTopics = this.pickTopics(item2.associations);
-          }
-        });
+        if (!!content.gradeLevel) {
+          item.terms.map((item2) => {
+            if (item2.name === content.gradeLevel) {
+              gradeTopics = this.pickTopics(item2.associations);
+            }
+          });
+        } else {
+          gradeTopics = [...this.topics];
+        }
       } else if (item.code === 'medium') {
-        item.terms.map((item2) => {
-          if (item2.name == content.medium) {
-            mediumTopics = this.pickTopics(item2.associations);
-          }
-        });
+        if (!!content.medium) {
+          item.terms.map((item2) => {
+            if (item2.name === content.medium) {
+              mediumTopics = this.pickTopics(item2.associations);
+            }
+          });
+        } else {
+          mediumTopics = [...this.topics];
+        }
       }
     });
     const finalarry = _.intersectionBy(this.topics, boardTopics, gradeTopics, subjectTopics, mediumTopics, 'identifier');
     this.topics = finalarry;
     this.topics.map((item) => {
       item.expanded = false;
-      item.item = item.name;
+      item.item = item.name; 
       if (item.children && item.children.length) {
         item.children.map((child) => {
           child.expanded = false;
@@ -297,7 +312,7 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
   }
 
   generateData(data) {
-    // this.showLoader = true;
+
     const requestData = _.cloneDeep(data);
     requestData['gradeLevel'] = [requestData['gradeLevel']];
     requestData['name'] = 'Untitled',

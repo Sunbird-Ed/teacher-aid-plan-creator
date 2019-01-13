@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfigService, ServerResponse, ResourceService, IUserData, IUserProfile, ToasterService } from '@sunbird/shared';
-import { PublicDataService, SearchService, FormService, UserService } from '@sunbird/core';
+import { ConfigService, ResourceService, IUserData, IUserProfile, ToasterService } from '@sunbird/shared';
+import { PublicDataService, UserService, SearchService } from '@sunbird/core';
 import { EditorService } from './../../services';
 import { TeachingPackService } from '../../services';
 import { MyUploadAdapter } from './file-uploader';
+
 import * as _ from 'lodash';
 import { from } from 'rxjs';
 @Component({
@@ -14,13 +15,10 @@ import { from } from 'rxjs';
   styleUrls: ['./create-teaching-method.component.css']
 })
 export class CreateTeachingMethodComponent implements OnInit {
-
+  @ViewChild('modal') modal;
   public Editor: ClassicEditor = ClassicEditor;
-  public myUploadAdapter: MyUploadAdapter;
-
   public userProfile: IUserProfile;
   public framework: string;
-  public configService: ConfigService;
   private editorService: EditorService;
   private toasterService: ToasterService;
   public resourceService: ResourceService;
@@ -31,33 +29,33 @@ export class CreateTeachingMethodComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private userService: UserService,
-    configService: ConfigService,
+    private configService: ConfigService,
     editorService: EditorService,
     toasterService: ToasterService,
     resourceService: ResourceService,
     public publicDataService: PublicDataService,
-    public teachingPackService: TeachingPackService
+    private teachingPackService: TeachingPackService,
+    private searchService: SearchService
 
   ) {
     this.userService = userService;
-    this.configService = configService;
+    // this.configService = configService;
     this.editorService = editorService;
     this.toasterService = toasterService;
     this.resourceService = resourceService;
   }
-  topicList = [];
+  pageNo = 1;
+  myAssets = [];
   editorData: any;
   contentId: string;
   methodId: string;
   collectionDetails = {};
+  associatedResources = [];
   methodDetails = {
     selectedMethod: '',
     methodDuration: '',
     methodDescription: ''
   };
-  // selectedMethod: any;
-  // methodDuration: string;
-  // methodDescription: string;
   teachingMethodList = [
     {
       'id': 1,
@@ -390,15 +388,13 @@ export class CreateTeachingMethodComponent implements OnInit {
       viewportTopOffset: 30
     }
   };
-
+  showResoursePicker: boolean;
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
-      console.log('paramsssss', params);
       this.contentId = params['contentId'];
     });
     this.activatedRoute.queryParams.subscribe(params => {
       this.methodId = params['methodId'];
-      console.log('method id ', this.methodId);
     });
     this.getMethodDetails();
     this.userService.userData$.subscribe(
@@ -423,14 +419,23 @@ export class CreateTeachingMethodComponent implements OnInit {
     // options.params.mode = 'edit';
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET}/${this.methodId}`,
-      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description' }
+      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description,board,gradeLevel,subject,medium' }
     };
+    const req2 = {
+      url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.methodId}`,
+      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description,children' }
+    };
+    this.teachingPackService.get(req2).subscribe((res) => {
+      _.map(res.result.content.children, (item) => {
+        this.associatedResources.push(item);
+      });
+    });
     this.publicDataService.get(req).subscribe((res) => {
       this.collectionDetails = res.result.content;
       this.methodDetails.methodDuration = this.collectionDetails['duration'];
       this.methodDetails.methodDescription = this.collectionDetails['description'];
       this.methodDetails.selectedMethod = this.collectionDetails['methodtype'];
-      this.model.editorData = this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
+      this.model.editorData = !!this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
       this.editorinstance.setData(this.collectionDetails['body']);
     });
   }
@@ -468,8 +473,130 @@ export class CreateTeachingMethodComponent implements OnInit {
   MyCustomUploadAdapterPlugin(editor) {
     editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
       // Configure the URL to the upload script in your back-end here!
-      return new MyUploadAdapter(loader, 'https://staging.open-sunbird.org/action/content/v3/upload/do_21267211063479500813877');
+      // return new MyUploadAdapter(loader, configService, teachingPackService);
     };
   }
 
+  initializeImagePicker() {
+    this.showResoursePicker = true;
+    const req = {
+      url: `${this.configService.urlConFig.URLS.COMPOSITE.SEARCHV3}`,
+      data: {
+        'request': {
+          filters: {
+            mediaType: ['image'],
+            contentType: 'Asset',
+            compatibilityLevel: {
+              min: 1, max: 2
+            },
+            status: ['Live', 'Review', 'Draft'],
+            createdBy: '3dcabadc-58e5-4b78-adb7-0013e5b5306b'
+          },
+          limit: 50,
+          offset: 0
+        }
+      }
+    };
+    this.teachingPackService.post(req).subscribe((res) => {
+      this.myAssets = res.result.content;
+    });
+  }
+
+  dismissImagePicker() {
+    this.showResoursePicker = false;
+  }
+
+  initializeResoursePicker() {
+    this.showResoursePicker = true;
+    if (this.pageNo === 1) {
+      this.getResources();
+    }
+  }
+
+  getResources() {
+    const req = {
+      url: `${this.configService.urlConFig.URLS.COMPOSITE.SEARCHV3}`,
+      data: {
+        'request': {
+          filters: {
+            contentType: ['Resource'],
+            objectType: ['Content'],
+            status: ['Live'],
+            board: this.collectionDetails['board'],
+            gradeLevel: this.collectionDetails['gradeLevel'],
+            subject: this.collectionDetails['subject'],
+            medium: this.collectionDetails['medium']
+          },
+          limit: 50,
+          offset: this.pageNo - 1
+        }
+      }
+    };
+
+    this.teachingPackService.post(req).subscribe((res) => {
+      _.map(res.result.content, (item) => {
+        const recource = _.find(this.associatedResources, ['identifier', item.identifier]);
+        if (recource !== undefined) {
+          item['selected'] = true;
+        }
+        this.myAssets.push(item);
+      });
+    });
+  }
+  dismissResoursePicker() {
+    this.showResoursePicker = false;
+  }
+
+  selectResourse(item) {
+    item['selected'] = !item['selected'];
+    const recource = _.find(this.associatedResources, ['identifier', item.identifier]);
+    if (recource === undefined) {
+      this.associatedResources.push(item);
+    } else {
+      const arr = _.remove(this.associatedResources, (res) => {
+        return res.identifier !== item.identifier;
+      });
+      this.associatedResources = [...arr];
+    }
+  }
+
+  removeResource(item) {
+    const arr = _.remove(this.associatedResources, (res) => {
+      return res.identifier !== item.identifier;
+    });
+    this.associatedResources = [...arr];
+    this.addResources();
+  }
+  addResources() {
+    const children = [];
+    _.map(this.associatedResources, (item) => {
+      children.push(item.identifier);
+    });
+    const req = {
+      url: `action/${this.configService.urlConFig.URLS.CONTENT.UPDATE_HIERARCHY}`,
+      data: {
+        'request': {
+          data: {
+            nodesModified: {},
+            hierarchy: {
+              [this.methodId]: {
+                'contentType': 'TeachingMethod',
+                children: children,
+                root: true
+              }
+            }
+          }
+        }
+      }
+    };
+    this.teachingPackService.patch(req).subscribe((res) => {
+    });
+  }
+
+  lazyloadResources() {
+    if (this.myAssets.length / 50 >= 1) {
+      this.pageNo = Math.ceil(this.myAssets.length / 50) + 1;
+      this.getResources();
+    }
+  }
 }

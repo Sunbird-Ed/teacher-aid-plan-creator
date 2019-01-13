@@ -6,7 +6,7 @@
 <div class="publicmenusection ui secondary vertical menu">
   <a *ngIf='permissionService.permissionAvailable' appPermission [permission]='createRole' class="item" [routerLink]="['teachingpack',1]"
   [class.active]="router.isActive('/workspace/content/teachingpack') ">
-    {{resourceService?.frmelmnts?.snav?.teachingPack}}
+    Teaching Packs 
   </a>
   <a *ngIf='permissionService.permissionAvailable' appPermission [permission]='createRole' class="item" [routerLink]="['create']"
     routerLinkActive="active">

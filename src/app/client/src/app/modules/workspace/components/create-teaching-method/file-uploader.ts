@@ -1,18 +1,50 @@
+import { TeachingPackService } from '../../services';
+import { ConfigService } from '@sunbird/shared';
+import { ReflectiveInjector } from '@angular/core';
+import { Injector } from "@angular/core";
+import { HttpClient } from '@angular/common/http';
+import { Http, HttpModule } from "@angular/http";
+import { Injectable } from '@angular/core';
+
+@Injectable({
+    providedIn: 'root',
+})
 export class MyUploadAdapter {
+    http: any;
     loader: any;
     url: any;
     xhr: any;
-    constructor(loader, url) {
+    teachingPackService: TeachingPackService;
+    configService: ConfigService;
+    // teachingPackService: any;
+    // configService: any;
+    constructor(
+        loader,
+        teachingPackService,
+        configService
+    ) {
+        // MyUploadAdapter.http = this.http;
         this.loader = loader;
-        this.url = url;
-    }
-
+        // this.configService = new ConfigService();
+        // const providers = (<any>HttpModule).decorators[0].args[0].providers;
+        // const injector = ReflectiveInjector.resolveAndCreate(providers);
+        // this.http = injector.get(Http);
+        // const injector2 = ReflectiveInjector.resolveAndCreate([this.configService, providers]);
+        // this.teachingPackService = injector2.get(TeachingPackService);
+        // const injector2 = Injector.create([
+        //     { useClass: ConfigService, provide: ConfigService, deps: [this.http] }
+        // ]);
+        // this.configService = injector2.get(ConfigService);
+        // console.log('urlll', this.configService.urlConFig.URLS.CONTENT.UPLOAD_IMAGE);
+        // this.teachingPackService = new TeachingPackService(this.configService, this.http);
+    } 
     upload() {
-        return new Promise((resolve, reject) => {
-            this._initRequest();
-            this._initListeners(resolve, reject);
-            this._sendRequest();
-        });
+        this.createContent();
+        // return new Promise((resolve, reject) => {
+        //     this._initRequest();
+        //     this._initListeners(resolve, reject);
+        //     this._sendRequest();
+        // });
     }
 
     _initRequest() {
@@ -82,5 +114,56 @@ export class MyUploadAdapter {
 
         // Send the request.
         this.xhr.send(data);
+    }
+    createContent() {
+        const req = {
+            url: 'action/content/v3/create',
+            data: {
+                'request': {
+                    content: {
+                        name: 'New Image',
+                        contentType: 'Asset',
+                        mediaType: 'mediaType',
+                        mimeType: 'image/png',
+                        createdBy: '3dcabadc-58e5-4b78-adb7-0013e5b5306b'
+                    }
+                }
+            }
+        };
+        this.teachingPackService.post(req).subscribe((res) => {
+            console.log('media upload object ', res);
+            const imgId = res['result'].node_id;
+            const imagedata = new FormData();
+            imagedata.append('file', this.loader.file);
+            const request = {
+                url: `${this.configService.urlConFig.URLS.CONTENT.UPLOAD_IMAGE}/${imgId}`,
+                data: {
+                    imagedata
+                }
+            };
+
+            this.teachingPackService.post(request).subscribe((response) => {
+                console.log('media upload ', response);
+            });
+        });
+        // {
+        //     'request':
+        //     {
+        //         'content':
+        //         {
+        //             "name": 'Screenshot from 2018-11-12 15-14-16',
+        //                 'creator': 'ABTC New',
+        //                     'createdBy': '3dcabadc-58e5-4b78-adb7-0013e5b5306b',
+        //                         'code': 'org.ekstep0.807443237213088',
+        //                             'mimeType': 'image/png', 'mediaType': 'image',
+        //                                 'contentType': 'Asset', 'osId':
+        //             'org.ekstep.quiz.app', 'language': ['English']
+        //         }
+        //     }
+        // }
+
+    }
+    linkImage() {
+
     }
 }
