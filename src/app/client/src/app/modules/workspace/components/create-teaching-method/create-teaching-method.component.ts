@@ -3,12 +3,9 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfigService, ResourceService, IUserData, IUserProfile, ToasterService } from '@sunbird/shared';
 import { PublicDataService, UserService, SearchService } from '@sunbird/core';
-import { EditorService } from './../../services';
 import { TeachingPackService } from '../../services';
-import { MyUploadAdapter } from './file-uploader';
-
+// import { UploadAdapter } from './ckeditor-image-uploader';
 import * as _ from 'lodash';
-import { from } from 'rxjs';
 @Component({
   selector: 'app-create-teaching-method',
   templateUrl: './create-teaching-method.component.html',
@@ -19,7 +16,6 @@ export class CreateTeachingMethodComponent implements OnInit {
   public Editor: ClassicEditor = ClassicEditor;
   public userProfile: IUserProfile;
   public framework: string;
-  private editorService: EditorService;
   private toasterService: ToasterService;
   public resourceService: ResourceService;
   public model = {
@@ -30,7 +26,6 @@ export class CreateTeachingMethodComponent implements OnInit {
     private router: Router,
     private userService: UserService,
     private configService: ConfigService,
-    editorService: EditorService,
     toasterService: ToasterService,
     resourceService: ResourceService,
     public publicDataService: PublicDataService,
@@ -40,12 +35,13 @@ export class CreateTeachingMethodComponent implements OnInit {
   ) {
     this.userService = userService;
     // this.configService = configService;
-    this.editorService = editorService;
     this.toasterService = toasterService;
     this.resourceService = resourceService;
   }
   pageNo = 1;
   myAssets = [];
+  myResources = [];
+  allImages = [];
   editorData: any;
   contentId: string;
   methodId: string;
@@ -389,6 +385,10 @@ export class CreateTeachingMethodComponent implements OnInit {
     }
   };
   showResoursePicker: boolean;
+  showImagePicker: boolean;
+  showImageUploadModal: boolean;
+  showErrorMsg: boolean;
+  errorMsg: string;
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.contentId = params['contentId'];
@@ -406,24 +406,19 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.create();
   }
 
-  createContent() {
-    this.updatePlanMetaData();
-  }
-
   goToPacks() {
     this.router.navigate(['workspace/content/teachingpack', 1]);
   }
 
   getMethodDetails() {
     const options: any = { params: {} };
-    // options.params.mode = 'edit';
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET}/${this.methodId}`,
-      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description,board,gradeLevel,subject,medium' }
+      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description,board,gradeLevel,subject,medium,pedagogyStep' }
     };
     const req2 = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.methodId}`,
-      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description,children' }
+      param: { mode: 'edit' }
     };
     this.teachingPackService.get(req2).subscribe((res) => {
       _.map(res.result.content.children, (item) => {
@@ -435,18 +430,19 @@ export class CreateTeachingMethodComponent implements OnInit {
       this.methodDetails.methodDuration = this.collectionDetails['duration'];
       this.methodDetails.methodDescription = this.collectionDetails['description'];
       this.methodDetails.selectedMethod = this.collectionDetails['methodtype'];
-      this.model.editorData = !!this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
-      this.editorinstance.setData(this.collectionDetails['body']);
+      // this.model.editorData = !!this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
+      const editorData = !!this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
+      this.editorinstance.setData(editorData);
     });
   }
 
-  updatePlanMetaData() {
+  updateMethodData() {
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.UPDATE}/${this.methodId}`,
       data: {
         'request': {
           content: {
-            duration: this.methodDetails.methodDuration.toString(),
+            duration: !!this.methodDetails.methodDuration ? this.methodDetails.methodDuration.toString() : '0',
             description: this.methodDetails.methodDescription,
             body: this.editorinstance.getData(),
             methodtype: this.methodDetails.selectedMethod,
@@ -456,29 +452,32 @@ export class CreateTeachingMethodComponent implements OnInit {
       }
     };
     this.publicDataService.patch(req).subscribe((res) => {
-      setTimeout(() => {
-        this.router.navigate(['workspace/new/teachingpack', this.contentId]);
-      }, 2000);
+      this.updateLessonPlan();
     });
   }
 
   create() {
     this.Editor.create(document.querySelector('#editor'), {
-      extraPlugins: [this.MyCustomUploadAdapterPlugin]
+      toolbar: ['heading', '|', 'bold', '|', 'italic', '|', 'link', '|',
+        'bulletedList', '|', 'numberedList', '|', 'blockQuote', '|', 'insertTable', '|', 'mediaEmbed', '|'],
+      image: {
+        toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
+        styles: ['full', 'alignLeft', 'alignRight', 'side', 'alignCenter']
+      },
+      removePlugins: ['ImageCaption'],
     }).then((editorinstance) => {
       this.editorinstance = editorinstance;
+      // editorinstance.plugins.get('FileRepository').createUploadAdapter = loader => {
+      //   return new UploadAdapter(this.configService, this.teachingPackService, this.userProfile, loader);
+      // };
     });
   }
 
-  MyCustomUploadAdapterPlugin(editor) {
-    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-      // Configure the URL to the upload script in your back-end here!
-      // return new MyUploadAdapter(loader, configService, teachingPackService);
-    };
-  }
 
-  initializeImagePicker() {
-    this.showResoursePicker = true;
+  getMyImages(offset) {
+    if (offset === 0) {
+      this.myAssets.length = 0;
+    }
     const req = {
       url: `${this.configService.urlConFig.URLS.COMPOSITE.SEARCHV3}`,
       data: {
@@ -489,21 +488,19 @@ export class CreateTeachingMethodComponent implements OnInit {
             compatibilityLevel: {
               min: 1, max: 2
             },
-            status: ['Live', 'Review', 'Draft'],
-            createdBy: '3dcabadc-58e5-4b78-adb7-0013e5b5306b'
+            status: ['Live'],
+            createdBy: this.userProfile.userId
           },
           limit: 50,
-          offset: 0
+          offset: offset
         }
       }
     };
     this.teachingPackService.post(req).subscribe((res) => {
-      this.myAssets = res.result.content;
+      _.map(res.result.content, (item) => {
+        this.myAssets.push(item);
+      });
     });
-  }
-
-  dismissImagePicker() {
-    this.showResoursePicker = false;
   }
 
   initializeResoursePicker() {
@@ -539,7 +536,7 @@ export class CreateTeachingMethodComponent implements OnInit {
         if (recource !== undefined) {
           item['selected'] = true;
         }
-        this.myAssets.push(item);
+        this.myResources.push(item);
       });
     });
   }
@@ -547,6 +544,18 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.showResoursePicker = false;
   }
 
+  dismissImagePicker() {
+    this.showImagePicker = false;
+  }
+
+  dismissImageUploadModal() {
+    this.showImagePicker = true;
+    this.showImageUploadModal = false;
+  }
+  initiateImageUploadModal() {
+    this.showImagePicker = false;
+    this.showImageUploadModal = true;
+  }
   selectResourse(item) {
     item['selected'] = !item['selected'];
     const recource = _.find(this.associatedResources, ['identifier', item.identifier]);
@@ -594,9 +603,151 @@ export class CreateTeachingMethodComponent implements OnInit {
   }
 
   lazyloadResources() {
-    if (this.myAssets.length / 50 >= 1) {
-      this.pageNo = Math.ceil(this.myAssets.length / 50) + 1;
+    if (this.myResources.length / 50 >= 1) {
+      this.pageNo = Math.ceil(this.myResources.length / 50) + 1;
       this.getResources();
+    }
+  }
+
+  updateLessonPlan() {
+    const req2 = {
+      url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.contentId}`,
+      param: { mode: 'edit' }
+    };
+    this.teachingPackService.get(req2).subscribe((res) => {
+      const pedagogySteps = JSON.parse(res.result.content['pedagogySteps']);
+      const versionKey = res.result.content.versionKey;
+      _.map(pedagogySteps, (item) => {
+        if (item.name === this.collectionDetails['pedagogyStep']) {
+          item['duration'] = this.methodDetails.methodDuration.toString();
+          item['MethodType'] = this.methodDetails.selectedMethod;
+        }
+      });
+      const req = {
+        url: `${this.configService.urlConFig.URLS.CONTENT.UPDATE}/${this.contentId}`,
+        data: {
+          'request': {
+            content: {
+              pedagogySteps: pedagogySteps,
+              versionKey: versionKey
+            }
+          }
+        }
+      };
+      this.publicDataService.patch(req).subscribe((response) => {
+        setTimeout(() => {
+          this.router.navigate(['workspace/new/teachingpack', this.contentId]);
+        }, 2000);
+      });
+    });
+  }
+
+  initializeImagePicker() {
+    this.showImagePicker = true;
+  }
+
+  addImageInEditor(imageUrl) {
+    this.editorinstance.model.change(writer => {
+      const imageElement = writer.createElement('image', {
+        src: imageUrl
+      });
+      this.editorinstance.model.insertContent(imageElement, this.editorinstance.model.document.selection);
+    });
+    this.showImagePicker = false;
+  }
+
+  getAllImages(offset) {
+    console.log('pageNo', offset);
+    if (offset === 0) {
+      this.allImages.length = 0;
+    }
+    const req = {
+      url: `${this.configService.urlConFig.URLS.COMPOSITE.SEARCHV3}`,
+      data: {
+        'request': {
+          filters: {
+            mediaType: ['image'],
+            contentType: 'Asset',
+            compatibilityLevel: {
+              min: 1, max: 2
+            },
+            status: ['Live']
+          },
+          limit: 50,
+          offset: offset
+        }
+      }
+    };
+    this.teachingPackService.post(req).subscribe((res) => {
+      _.map(res.result.content, (item) => {
+        this.allImages.push(item);
+      });
+    });
+  }
+  lazyloadMyImages() {
+    const offset = this.myAssets.length;
+    this.getMyImages(offset);
+  }
+
+  lazyloadAllImages() {
+    const offset = this.allImages.length;
+    this.getAllImages(offset);
+  }
+  uploadImage(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const formData: FormData = new FormData();
+    formData.append('file', file);
+    const fileType = file.type;
+    const fileName = file.name;
+    const fileSize = file.size / 1024 / 1024;
+    if (fileType.split('/')[0] === 'image') {
+      this.showErrorMsg = false;
+      if (fileSize > 1) {
+        this.showErrorMsg = true;
+        this.errorMsg = 'Max size allowed is 1MB';
+      } else {
+        this.errorMsg = '';
+        this.showErrorMsg = false;
+        reader.readAsDataURL(file);
+      }
+    } else {
+      this.showErrorMsg = true;
+      this.errorMsg = 'Please choose an image file';
+    }
+    if (!this.showErrorMsg) {
+      // reader.onload = (uploadEvent: any) => {
+      const req = {
+        url: this.configService.urlConFig.URLS.CONTENT.CREATE_CONTENT,
+        data: {
+          'request': {
+            content: {
+              name: fileName,
+              contentType: 'Asset',
+              mediaType: 'image',
+              mimeType: fileType,
+              createdBy: this.userProfile.userId,
+              language: ['English'],
+              creator: `${this.userProfile.firstName} ${this.userProfile.lastName ? this.userProfile.lastName : ''}`,
+              code: 'org.ekstep0.5375271337424472',
+            }
+          }
+        }
+      };
+      this.teachingPackService.post(req).subscribe((res) => {
+        const imgId = res['result'].node_id;
+        const request = {
+          url: `${this.configService.urlConFig.URLS.CONTENT.UPLOAD_IMAGE}/${imgId}`,
+          data: formData
+        };
+        this.teachingPackService.post(request).subscribe((response) => {
+          this.addImageInEditor(response.result.content_url);
+          this.showImagePicker = false;
+          this.showImageUploadModal = false;
+        });
+      });
+      reader.onerror = (error: any) => {
+      };
     }
   }
 }

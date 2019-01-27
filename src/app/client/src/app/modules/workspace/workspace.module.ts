@@ -5,7 +5,7 @@ import { WorkspaceRoutingModule } from './workspace-routing.module';
 import { SharedModule } from '@sunbird/shared';
 import { SuiModule } from 'ng2-semantic-ui/dist';
 import { FormsModule, ReactiveFormsModule, } from '@angular/forms';
-import { WorkSpaceService, EditorService , BatchService, ReviewCommentsService, TeachingPackService} from './services';
+import { WorkSpaceService, EditorService, BatchService, ReviewCommentsService, TeachingPackService } from './services';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {
   WorkspaceComponent, CreateContentComponent, DraftComponent,
@@ -18,7 +18,7 @@ import {
   PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, AllMyContentFilterComponent, CollaboratingOnComponent,
   CollaborationContentFilterComponent, TeachingPackComponent, PadagogyTopicSelectorComponent, CreateTeachingPackComponent,
-  CreateTeachingMethodComponent
+  CreateTeachingMethodComponent, TeachingPackFilterComponent
 } from './components';
 import { NgInviewModule } from 'angular-inport';
 import { TelemetryModule } from '@sunbird/telemetry';
@@ -64,7 +64,8 @@ import { TreeNgxModule } from 'tree-ngx';
     TeachingPackComponent,
     PadagogyTopicSelectorComponent,
     CreateTeachingPackComponent,
-    CreateTeachingMethodComponent
+    CreateTeachingMethodComponent,
+    TeachingPackFilterComponent
   ],
   providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService, TeachingPackService]
 })

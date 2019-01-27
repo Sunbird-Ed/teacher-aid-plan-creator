@@ -65,7 +65,7 @@
                     <div class="description">
                       <p>
                         {{step.info?.description | slice:0:60}}
-                        <i *ngIf="step.info?.description.length > 60">...</i>
+                        <i *ngIf="step.info?.description?.length > 60">...</i>
                       </p>
                     </div>
                   </div>
