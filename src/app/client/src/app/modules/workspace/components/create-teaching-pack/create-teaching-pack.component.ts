@@ -59,7 +59,7 @@ export class CreateTeachingPackComponent implements OnInit {
       this.lessonDescription = this.collectionDetails['description'];
       this.topicName = this.collectionDetails['topics'];
       this.padagogySteps = JSON.parse(this.collectionDetails['pedagogySteps']);
-      const children = _.filter(this.collectionDetails['children'], ['contentType', 'TeachingMethod']);
+      const children = _.filter(this.collectionDetails['children'], ['contentType', 'TeacherAidUnit']);
       _.forEach(this.padagogySteps, (item) => {
         _.forEach(children, (item2) => {
           if (item.name === item2.pedagogyStep) {
@@ -150,7 +150,7 @@ export class CreateTeachingPackComponent implements OnInit {
       requestData['createdBy'] = this.userProfile.id,
       requestData['organisation'] = this.userProfile.organisationNames,
       requestData['createdFor'] = this.userProfile.organisationIds,
-      requestData['contentType'] = 'TeachingMethod',
+      requestData['contentType'] = 'TeacherAidUnit',
       requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
       requestData['board'] = this.collectionDetails['board'];
       requestData['gradeLevel'] = this.collectionDetails['gradeLevel'];

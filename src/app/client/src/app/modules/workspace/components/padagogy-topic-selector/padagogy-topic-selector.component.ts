@@ -154,10 +154,10 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
           if (item.code === 'topic') {
             this.topics = item.terms;
           }
-          if (item.code === 'pedagogyFlow') {
+          if (item.code === 'contentTemplate') {
             this.padagogyList = item.terms;
           }
-          if (item.code === 'pedagogyStep') {
+          if (item.code === 'contentTemplateUnits') {
             this.pedagogyStepList = item.terms;
           }
         });
@@ -198,11 +198,12 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
       item['pedagogyStep'] = [];
       item.associations = _.intersectionBy(this.pedagogyStepList, item.associations, 'identifier');
       item.associations.map((step) => {
-        if (step.category === 'pedagogyStep') {
+        if (step.category === 'contentTemplateUnits') {
           item['pedagogyStep'].push(step);
         }
       });
     });
+    console.log('padagogyList', this.padagogyList);
     this.showPadagogySelector = true;
   }
 
@@ -226,7 +227,7 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
             }
           });
         } else {
-            boardTopics = [...this.topics];
+          boardTopics = [...this.topics];
         }
       } else if (item.code === 'subject') {
         if (!!content.subject) {
@@ -264,7 +265,7 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     this.topics = finalarry;
     this.topics.map((item) => {
       item.expanded = false;
-      item.item = item.name; 
+      item.item = item.name;
       if (item.children && item.children.length) {
         item.children.map((child) => {
           child.expanded = false;
@@ -320,12 +321,12 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
       requestData['createdBy'] = this.userProfile.id,
       requestData['organisation'] = this.userProfile.organisationNames,
       requestData['createdFor'] = this.userProfile.organisationIds,
-      requestData['contentType'] = 'LessonPlan',
+      requestData['contentType'] = 'TeacherAid',
       requestData['framework'] = this.framework;
     requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
     requestData['topics'] = this.selectedTopic[0];
     requestData['pedagogySteps'] = this.selectedFlow['pedagogyStep'];
-    requestData['resourceType'] = 'Lesson Plan';
+    // requestData['resourceType'] = 'Lesson Plan';
     if (!_.isEmpty(this.userProfile.lastName)) {
       requestData['creator'] = this.userProfile.firstName + ' ' + this.userProfile.lastName;
     } else {

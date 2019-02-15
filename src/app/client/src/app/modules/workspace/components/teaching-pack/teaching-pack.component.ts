@@ -249,13 +249,13 @@ export class TeachingPackComponent extends WorkSpace implements OnInit {
       filters: {
         status: bothParams.queryParams.status ? bothParams.queryParams.status : preStatus,
         createdBy: this.userService.userid,
-        contentType: this.config.appConfig.WORKSPACE.contentType,
+        contentType: 'TeacherAid',
         objectType: this.config.appConfig.WORKSPACE.objectType,
         board: bothParams.queryParams.board,
         subject: bothParams.queryParams.subject,
         medium: bothParams.queryParams.medium,
         gradeLevel: bothParams.queryParams.gradeLevel,
-        resourceType: ['Lesson Plan']
+        // resourceType: ['Lesson Plan']
       },
       limit: limit,
       offset: (pageNumber - 1) * (limit),
