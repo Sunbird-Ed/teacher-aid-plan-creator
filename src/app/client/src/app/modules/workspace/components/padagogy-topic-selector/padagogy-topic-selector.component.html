@@ -71,14 +71,36 @@
         <h6 class="ui horizontal divider">
           Select Topic
         </h6>
-        <div class="topic-selector">
-          <tree-ngx [options]="treeOptions" (selectedItems)="selecedItemsChanged($event)" [nodeItems]="topics">
-            <ng-template #nodeCollapsibleTemplate let-expanded="expanded">
+        <form class="ui form">
+          <div class="content">
+          <div class="field"> 
+            <input (keyup.enter)="searchTopic($event)" name="searchTopic" type="text" placeholder="Search Topic">
+          </div>
+        </div>
+        </form>
+        <div *ngIf="seachTopicString.length > 0 else allTopics" class="topic-selector">
+          <tree-ngx [options]="treeOptions" (selectedItems)="selecedItemsChanged($event)" [nodeItems]="filteredTopics">
+            <ng-template #nodeCollapsibleTemplatee let-expanded="expanded">
               <span *ngIf="expanded"><i class="minus square outline icon"></i></span>
               <span *ngIf="!expanded"><i class="plus square outline icon"></i></span>
             </ng-template>
           </tree-ngx>
         </div>
+        <ng-template #allTopics>
+          <div class="topic-selector" *ngIf="topics.length > 0 else noResult" >
+            <tree-ngx [options]="treeOptions" (selectedItems)="selecedItemsChanged($event)" [nodeItems]="topics">
+              <ng-template #nodeCollapsibleTemplate let-expanded="expanded">
+                <span *ngIf="expanded"><i class="minus square outline icon"></i></span>
+                <span *ngIf="!expanded"><i class="plus square outline icon"></i></span>
+              </ng-template>
+            </tree-ngx>
+          </div>
+        </ng-template>
+        <ng-template #noResult>
+          <div class="text-center p-20">
+            No topic found
+          </div>
+        </ng-template>
       </div>
     </div>
     <div class="actions">

@@ -384,7 +384,7 @@ export class CreateTeachingMethodComponent implements OnInit {
       viewportTopOffset: 30
     }
   };
-  showResoursePicker: boolean;
+  showResourcePicker: boolean;
   showImagePicker: boolean;
   showImageUploadModal: boolean;
   showErrorMsg: boolean;
@@ -503,8 +503,8 @@ export class CreateTeachingMethodComponent implements OnInit {
     });
   }
 
-  initializeResoursePicker() {
-    this.showResoursePicker = true;
+  initializeResourcePicker() {
+    this.showResourcePicker = true;
     if (this.pageNo === 1) {
       this.getResources();
     }
@@ -540,8 +540,8 @@ export class CreateTeachingMethodComponent implements OnInit {
       });
     });
   }
-  dismissResoursePicker() {
-    this.showResoursePicker = false;
+  dismissResourcePicker() {
+    this.showResourcePicker = false;
   }
 
   dismissImagePicker() {
@@ -556,7 +556,7 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.showImagePicker = false;
     this.showImageUploadModal = true;
   }
-  selectResourse(item) {
+  selectResource(item) {
     item['selected'] = !item['selected'];
     const recource = _.find(this.associatedResources, ['identifier', item.identifier]);
     if (recource === undefined) {

@@ -20,8 +20,8 @@
             <i class="cloud upload icon"></i>
             Save
           </button>
-          <div (click)="initializeResoursePicker()" class="ui primary right floated  button">
-            Add Resourse
+          <div (click)="initializeResourcePicker()" class="ui primary right floated  button">
+            Add Resource
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@
       </div>
       <div class="ui stacked segments" *ngIf="associatedResources.length > 0">
         <div class="ui segment">
-          <h2 class="ui header">Resourses</h2>
+          <h2 class="ui header">Resources</h2>
         </div>
         <div *ngFor="let resource of associatedResources" class="ui raised segment">
           <div class="ui grid">
@@ -117,14 +117,14 @@
   </div>
 </div>
 
-<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissResoursePicker()" *ngIf="showResoursePicker"
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissResourcePicker()" *ngIf="showResourcePicker"
   [size]="'large'" [isFullScreen]="false" [mustScroll]="true" #modal2>
-  <div class="header">Add Resourse</div>
+  <div class="header">Add Resource</div>
   <div class="scrolling content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="500"
     [scrollWindow]="false" (scrolled)="lazyloadResources()">
-    <div class="ui four cards">
+    <div class="ui four cards" *ngIf="myResources.length > 0 else noResorce">
       <div *ngFor="let data of myResources" [ngClass]="{'green' : data.selected}" class="ui card resource-card">
-        <div (click)="selectResourse(data)" class="ui slide masked reveal image">
+        <div (click)="selectResource(data)" class="ui slide masked reveal image">
           <img [src]="data.appIcon ? data.appIcon : 'assets/images/default.png'" class="visible content resource-image">
           <div class="hidden content resource-hidden-content">
             <div class="ui middle aligned divided list">
@@ -169,12 +169,17 @@
         </div> -->
       </div>
     </div>
+    <ng-template #noResorce>
+       <div class="text-center">
+         No Resource Found 
+       </div>
+    </ng-template>
   </div>
   <div class="actions">
     <div class="ui buttons">
-      <button (click)="dismissResoursePicker()" class="ui button">Cancel</button>
+      <button (click)="dismissResourcePicker()" class="ui button">Cancel</button>
       <div class="or"></div>
-      <button (click)="addResources();dismissResoursePicker()" class="ui primary button">Save</button>
+      <button [disabled]="myResources.length < 1" (click)="addResources();dismissResourcePicker()" class="ui primary button">Save</button>
     </div>
   </div>
 </sui-modal>

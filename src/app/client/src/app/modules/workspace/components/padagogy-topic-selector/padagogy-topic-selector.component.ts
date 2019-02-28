@@ -97,6 +97,8 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     alwaysEmitSelected: true
   };
   copyDeep = [];
+  seachTopicString = '';
+  filteredTopics = [];
   ngOnInit() {
     this.frameworkService.initialize();
     this.fetchFrameworkMetaData();
@@ -223,7 +225,11 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
         if (!!content.board) {
           item.terms.map((item2) => {
             if (item2.name === content.board) {
-              boardTopics = this.pickTopics(item2.associations);
+              if (!!item2.associations && !!item2.associations.length) {
+                boardTopics = this.pickTopics(item2.associations);
+              } else {
+                boardTopics = this.pickTopics(item2.associations);
+              }
             }
           });
         } else {
@@ -233,7 +239,11 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
         if (!!content.subject) {
           item.terms.map((item2) => {
             if (item2.name === content.subject) {
-              subjectTopics = this.pickTopics(item2.associations);
+              if (!!item2.associations && !!item2.associations.length) {
+                subjectTopics = this.pickTopics(item2.associations);
+              } else {
+                subjectTopics = [...this.topics];
+              }
             }
           });
         } else {
@@ -243,7 +253,11 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
         if (!!content.gradeLevel) {
           item.terms.map((item2) => {
             if (item2.name === content.gradeLevel) {
-              gradeTopics = this.pickTopics(item2.associations);
+              if (!!item2.associations && !!item2.associations.length) {
+                gradeTopics = this.pickTopics(item2.associations);
+              } else {
+                gradeTopics = [...this.topics];
+              }
             }
           });
         } else {
@@ -253,7 +267,11 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
         if (!!content.medium) {
           item.terms.map((item2) => {
             if (item2.name === content.medium) {
-              mediumTopics = this.pickTopics(item2.associations);
+              if (!!item2.associations && !!item2.associations.length) {
+                mediumTopics = this.pickTopics(item2.associations);
+              } else {
+                mediumTopics = [...this.topics];
+              }
             }
           });
         } else {
@@ -333,6 +351,65 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
       requestData['creator'] = this.userProfile.firstName;
     }
     return requestData;
+  }
+
+  searchTopic = (keyword) => {
+    this.seachTopicString = keyword.target.value;
+    console.log('search string', keyword);
+    console.log('this.topics', this.topics);
+    const result = [];
+    if (this.seachTopicString.length) {
+      for (let i = 0; i < this.topics.length; i++) {
+        if (this.topics[i]['name'].search(new RegExp(this.seachTopicString, 'i')) < 0) {
+
+        } else {
+
+          const topic = this.topics[i];
+          topic.expanded = true;
+          result.push(topic);
+        }
+        if (!!this.topics[i].children && this.topics[i].children.length) {
+          for (let j = 0; j < this.topics[i].children.length; j++) {
+            if (this.topics[i].children[j]['name'].search(new RegExp(this.seachTopicString, 'i')) < 0) {
+            } else {
+              const topic = this.topics[i].children[j];
+              topic.expanded = true;
+              result.push(topic);
+            }
+            if (!!this.topics[i].children[j].children && this.topics[i].children[j].children.length) {
+              for (let k = 0; k < this.topics[i].children[j].children; k++) {
+                if (this.topics[i].children[j].children[k]['name'].search(new RegExp(this.seachTopicString, 'i')) < 0) {
+
+                } else {
+                  const topic = this.topics[i].children[j].children[k]
+                  topic.expanded = true;
+                  result.push(topic);
+                }
+              }
+            }
+          }
+        }
+      }
+      this.filteredTopics = _.uniqBy(result, 'identifier');
+    } else {
+      this.filteredTopics.length = 0;
+      this.topics.map((item) => {
+        item.expanded = false;
+        item.item = item.name;
+        if (item.children && item.children.length) {
+          item.children.map((child) => {
+            child.expanded = false;
+            child.item = child.name;
+            if (child.children && child.children.length) {
+              child.children.map((gchild) => {
+                gchild.item = gchild.name;
+              });
+            }
+          });
+        }
+      });
+    }
+    console.log('this.filteredTopics', this.filteredTopics);
   }
 }
 
