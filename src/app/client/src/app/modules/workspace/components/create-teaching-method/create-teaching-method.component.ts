@@ -396,6 +396,7 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe(params => {
       this.methodId = params['methodId'];
     });
+    this.teachingMethodList = _.orderBy(this.teachingMethodList, ['name'], ['asc']);
     this.getMethodDetails();
     this.userService.userData$.subscribe(
       (user: IUserData) => {
@@ -407,7 +408,7 @@ export class CreateTeachingMethodComponent implements OnInit {
   }
 
   goToPacks() {
-    this.router.navigate(['workspace/content/teachingpack', 1]);
+    this.router.navigate(['workspace/new/teachingpack', this.contentId]);
   }
 
   getMethodDetails() {
@@ -458,8 +459,8 @@ export class CreateTeachingMethodComponent implements OnInit {
 
   create() {
     this.Editor.create(document.querySelector('#editor'), {
-      toolbar: ['heading', '|', 'bold', '|', 'italic', '|', 'link', '|',
-        'bulletedList', '|', 'numberedList', '|', 'blockQuote', '|', 'insertTable', '|', 'mediaEmbed', '|'],
+      toolbar: ['heading', '|', 'bold', '|', 'italic', '|',
+        'bulletedList', '|', 'numberedList', '|', 'insertTable', '|'],
       image: {
         toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
         styles: ['full', 'alignLeft', 'alignRight', 'side', 'alignCenter']
@@ -657,7 +658,6 @@ export class CreateTeachingMethodComponent implements OnInit {
   }
 
   getAllImages(offset) {
-    console.log('pageNo', offset);
     if (offset === 0) {
       this.allImages.length = 0;
     }

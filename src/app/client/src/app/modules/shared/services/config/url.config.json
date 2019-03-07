@@ -42,7 +42,7 @@
     },
     "COMPOSITE": {
       "SEARCH": "composite/v1/search",
-      "SEARCHV3":"action/composite/v3/search"
+      "SEARCHV3": "action/composite/v3/search"
     },
     "SYSTEM_SETTING": {
       "CUSTODIAN_ORG": "data/v1/system/settings/get/custodianOrgId"
@@ -76,7 +76,10 @@
       "UPDATE_HIERARCHY": "content/v3/hierarchy/update",
       "GET_HIERARCHY": "action/content/v3/hierarchy",
       "CREATE_CONTENT": "action/content/v3/create",
-      "UPLOAD_IMAGE": "action/content/v3/upload"
+      "UPLOAD_IMAGE": "action/content/v3/upload",
+      "SUBMIT_FOR_REVIEW": "content/v1/review",
+      "PUBLISH_CONTENT": "content/v1/publish",
+      "REJECT_CONTENT": "content/v1/reject"
     },
     "DASHBOARD": {
       "ORG_CREATION": "dashboard/v1/creation/org",

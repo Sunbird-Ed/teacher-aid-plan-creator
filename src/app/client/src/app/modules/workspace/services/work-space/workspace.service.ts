@@ -70,7 +70,11 @@ export class WorkSpaceService {
     this.navigationHelperService.storeWorkSpaceCloseUrl();
     const mimeType = content.mimeType;
     if (mimeType === 'application/vnd.ekstep.content-collection') {
-      this.openCollectionEditor(content, state);
+      if (content.contentType === 'TeacherAid') {
+        this.route.navigate(['workspace/new/teachingpack/' + content.identifier + '/preview']);
+      } else {
+        this.openCollectionEditor(content, state);
+      }
     } else if (mimeType === 'application/vnd.ekstep.ecml-archive') {
       this.openContent(content, state);
     } else if ((this.config.appConfig.WORKSPACE.genericMimeType).includes(mimeType)) {
@@ -85,7 +89,7 @@ export class WorkSpaceService {
   openCollectionEditor(content, state) {
     const lockParams = content.lock || {};
     this.route.navigate(['/workspace/content/edit/collection', content.identifier, content.contentType, state, content.framework]
-    , {queryParams: lockParams});
+      , { queryParams: lockParams });
   }
 
   /**
@@ -97,7 +101,7 @@ export class WorkSpaceService {
     if (this.config.appConfig.WORKSPACE.states.includes(state)) {
       const lockParams = content.lock || {};
       this.route.navigate(['/workspace/content/edit/content/', content.identifier, state, content.framework],
-      { queryParams: lockParams});
+        { queryParams: lockParams });
     } else {
       if (state === 'upForReview') {
         this.route.navigate(['workspace/content/upForReview/content', content.identifier]);
@@ -120,7 +124,7 @@ export class WorkSpaceService {
     if (this.config.appConfig.WORKSPACE.states.includes(state)) {
       const lockParams = content.lock || {};
       this.route.navigate(['/workspace/content/edit/generic/', content.identifier, state, content.framework],
-      {queryParams: lockParams});
+        { queryParams: lockParams });
     } else {
       if (state === 'review') {
         this.route.navigate(['workspace/content/review/content', content.identifier]);

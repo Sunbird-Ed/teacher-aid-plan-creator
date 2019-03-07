@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditorService } from './../../services';
 import { ContentService, PublicDataService, UserService } from '@sunbird/core';
-import { ConfigService, ServerResponse, IUserProfile, IUserData } from '@sunbird/shared';
+import { ConfigService, ServerResponse, IUserProfile, IUserData, ToasterService } from '@sunbird/shared';
 import { TeachingPackService } from '../../services';
 import * as _ from 'lodash';
 // import { ConfigService } from 'src/app/modules/shared';
@@ -21,7 +21,8 @@ export class CreateTeachingPackComponent implements OnInit {
     public publicDataService: PublicDataService,
     public configService: ConfigService,
     private userService: UserService,
-    public teachingPackService: TeachingPackService
+    public teachingPackService: TeachingPackService,
+    private toasterService: ToasterService
   ) { }
   padagogyFlow: any;
   contentId: string;
@@ -73,7 +74,7 @@ export class CreateTeachingPackComponent implements OnInit {
     });
   }
 
-  updatePlanMetaData(goToMethod, methodId) {
+  updatePlanMetaData(goToMethod, methodId, fromReview = false) {
     this.showLoader = true;
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.UPDATE}/${this.contentId}`,
@@ -88,14 +89,16 @@ export class CreateTeachingPackComponent implements OnInit {
       }
     };
     this.publicDataService.patch(req).subscribe((res) => {
-      setTimeout(() => {
-        if (goToMethod) {
-          this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod'],
-            { queryParams: { methodId: methodId } });
-        } else {
-          this.router.navigate(['workspace/content/teachingpack', 1]);
-        }
-      }, 2000);
+      if (!fromReview) {
+        setTimeout(() => {
+          if (goToMethod) {
+            this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod'],
+              { queryParams: { methodId: methodId } });
+          } else {
+            this.router.navigate(['workspace/content/teachingpack', 1]);
+          }
+        }, 2000);
+      }
     });
   }
 
@@ -152,15 +155,38 @@ export class CreateTeachingPackComponent implements OnInit {
       requestData['createdFor'] = this.userProfile.organisationIds,
       requestData['contentType'] = 'TeacherAidUnit',
       requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
-      requestData['board'] = this.collectionDetails['board'];
-      requestData['gradeLevel'] = this.collectionDetails['gradeLevel'];
-      requestData['subject'] = this.collectionDetails['subject'];
-      requestData['medium'] = this.collectionDetails['medium'];
+    requestData['board'] = this.collectionDetails['board'];
+    requestData['gradeLevel'] = this.collectionDetails['gradeLevel'];
+    requestData['subject'] = this.collectionDetails['subject'];
+    requestData['medium'] = this.collectionDetails['medium'];
     if (!_.isEmpty(this.userProfile.lastName)) {
       requestData['creator'] = this.userProfile.firstName + ' ' + this.userProfile.lastName;
     } else {
       requestData['creator'] = this.userProfile.firstName;
     }
     return requestData;
+  }
+
+  submitForReview() {
+    this.showLoader = true;
+    this.updatePlanMetaData(false, this.contentId, true);
+    const req = {
+      url: `${this.configService.urlConFig.URLS.CONTENT.SUBMIT_FOR_REVIEW}/${this.contentId}`,
+      data: {
+        'request': {
+          // content: {
+          //   name: this.lessonName,
+          //   description: this.lessonDescription,
+          //   versionKey: this.collectionDetails['versionKey']
+          // }
+        }
+      }
+    };
+    this.publicDataService.post(req).subscribe((res) => {
+      this.toasterService.success('Sent for review');
+      setTimeout(() => {
+        this.router.navigate(['workspace/content/teachingpack', 1]);
+      }, 2000);
+    });
   }
 }

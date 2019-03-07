@@ -7,7 +7,7 @@ import {
   BatchListComponent, UpdateBatchComponent, UpforreviewContentplayerComponent, ReviewsubmissionsContentplayerComponent,
   FlagConentplayerComponent, PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, CollaboratingOnComponent, TeachingPackComponent,
-  PadagogyTopicSelectorComponent, CreateTeachingPackComponent, CreateTeachingMethodComponent
+  PadagogyTopicSelectorComponent, CreateTeachingPackComponent, CreateTeachingMethodComponent, ReviewTeachingPackComponent
 } from './components';
 import { AuthGuard } from '../core/guard/auth-gard.service';
 const telemetryEnv = 'workspace';
@@ -297,15 +297,25 @@ const routes: Routes = [
     },
   },
   {
-      path: 'new/teachingpack/:contentId/teachingmethod', component: CreateTeachingMethodComponent,
-      data: {
-        telemetry: {
-          env: telemetryEnv, pageid: 'workspace-content--create-teachingpack', subtype: 'paginate',
-          uri: 'workspace/content/teachingpack/create',
-          type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
-        }, roles: 'allContentRole',
-        breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
-      }
+    path: 'new/teachingpack/:contentId/preview', component: ReviewTeachingPackComponent,
+    data: {
+      telemetry: {
+        env: telemetryEnv, pageid: 'workspace-content-teachingpack', subtype: 'paginate', uri: 'workspace/content/teachingpack',
+        type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
+      }, roles: 'allContentRole',
+      breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
+    },
+  },
+  {
+    path: 'new/teachingpack/:contentId/teachingmethod', component: CreateTeachingMethodComponent,
+    data: {
+      telemetry: {
+        env: telemetryEnv, pageid: 'workspace-content--create-teachingpack', subtype: 'paginate',
+        uri: 'workspace/content/teachingpack/create',
+        type: 'list', mode: 'create', object: { type: objectType, ver: '1.0' }
+      }, roles: 'allContentRole',
+      breadcrumbs: [{ label: 'Home', url: '/home' }, { label: 'Profile', url: '/profile' }, { label: 'My Workspace', url: '' }]
+    }
   }
 ];
 

@@ -522,7 +522,8 @@
       "TextBook",
       "Course",
       "LessonPlan",
-      "Resource"
+      "Resource",
+      "TeacherAid"
     ],
     "mimeType": [
       "application/vnd.ekstep.ecml-archive",

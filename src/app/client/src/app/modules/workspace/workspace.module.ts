@@ -18,7 +18,7 @@ import {
   PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, AllMyContentFilterComponent, CollaboratingOnComponent,
   CollaborationContentFilterComponent, TeachingPackComponent, PadagogyTopicSelectorComponent, CreateTeachingPackComponent,
-  CreateTeachingMethodComponent, TeachingPackFilterComponent
+  CreateTeachingMethodComponent, TeachingPackFilterComponent, ReviewTeachingPackComponent
 } from './components';
 import { NgInviewModule } from 'angular-inport';
 import { TelemetryModule } from '@sunbird/telemetry';
@@ -65,7 +65,8 @@ import { TreeNgxModule } from 'tree-ngx';
     PadagogyTopicSelectorComponent,
     CreateTeachingPackComponent,
     CreateTeachingMethodComponent,
-    TeachingPackFilterComponent
+    TeachingPackFilterComponent,
+    ReviewTeachingPackComponent
   ],
   providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService, TeachingPackService]
 })

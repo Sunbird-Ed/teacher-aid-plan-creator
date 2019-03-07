@@ -34,4 +34,5 @@ export * from './padagogy-topic-selector/padagogy-topic-selector.component';
 export * from './create-teaching-pack/create-teaching-pack.component';
 export * from './create-teaching-method/create-teaching-method.component';
 export * from './teaching-pack-filter/teaching-pack-filter.component';
+export * from './review-teaching-pack/review-teaching-pack.component';
 
