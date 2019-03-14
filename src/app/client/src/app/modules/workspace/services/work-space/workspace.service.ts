@@ -71,7 +71,13 @@ export class WorkSpaceService {
     const mimeType = content.mimeType;
     if (mimeType === 'application/vnd.ekstep.content-collection') {
       if (content.contentType === 'TeacherAid') {
-        this.route.navigate(['workspace/new/teachingpack/' + content.identifier + '/preview']);
+        const query = {};
+        if (content['userType'] === 'reviewer') {
+          query['type'] = 'reviewer';
+        } else if (content['userType'] === 'creatorReview') {
+          query['type'] = 'creatorReview';
+        }
+        this.route.navigate(['workspace/new/teachingpack/' + content.identifier + '/preview'], { queryParams: query });
       } else {
         this.openCollectionEditor(content, state);
       }

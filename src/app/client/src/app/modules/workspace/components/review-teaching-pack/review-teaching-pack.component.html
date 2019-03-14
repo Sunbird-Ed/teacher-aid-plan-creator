@@ -18,7 +18,7 @@
         <app-loader></app-loader>
       </div>
       <div *ngIf="!showLoader" class="ten wide stretched column">
-        <div class="actions actions margin-top-15">
+        <div class="actions actions margin-top-15" *ngIf="previewType === 'reviewer'">
           <div (click)="publishContent()" class="ui primary right floated  button">
             Publish
           </div>
@@ -50,11 +50,11 @@
                     <div class="content">
                       <label class="author">Duration : </label>
                       <div class="metadata">
-                        <div class="date">{{step.duration}} Minutes</div>
+                        <div class="text">{{step.duration}} Minutes</div>
                       </div>
                       <div class="text">
                         <div *ngIf="step.info?.description">
-                          <label class="author">Description :</label>
+                          <label class="author">Short Description :</label>
                           <p class="text">{{step.info?.description}}</p>
                         </div>
                         <div *ngIf="step.body">
@@ -92,10 +92,27 @@
               </div>
             </div>
           </div>
-
         </sui-tabset>
       </div>
       <div class="one wide column"></div>
     </div>
   </div>
 </div>
+
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissImageUploadModal()" *ngIf="someFlag" [size]="'normal'"
+  [isFullScreen]="false" [mustScroll]="true" #modal3>
+  <div class="header">View Resource</div>
+  <div class="content">
+    <div class="ui grid">
+      <div [ngClass]="showCommentBoxClass">
+        <app-player class="content-player" [playerConfig]="playerConfig" (contentProgressEvent)="contentProgressEvent($event)"
+          (sceneChangeEvent)="handleSceneChangeEvent($event)"></app-player>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui floated buttons">
+      <button (click)="dismissImageUploadModal();" class="ui primary button">Back</button>
+    </div>
+  </div>
+</sui-modal>

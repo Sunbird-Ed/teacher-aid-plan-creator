@@ -1,5 +1,5 @@
 
-import { combineLatest,  Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { WorkSpace } from './../../classes/workspace';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -273,7 +273,13 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
     this.route.navigate(['workspace/content/upForReview', this.pageNumber], { queryParams: this.queryParams });
   }
   contentClick(content) {
-    this.workSpaceService.navigateToContent(content, this.state);
+    if (content.contentType === 'TeacherAid') {
+      const param = content;
+      param['userType'] = 'reviewer';
+      this.workSpaceService.navigateToContent(param, this.state);
+    } else {
+      this.workSpaceService.navigateToContent(content, this.state);
+    }
   }
   /**
   * get inview  Data
@@ -306,11 +312,11 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
       contentType = ['TextBook'];
     }
     if (_.indexOf(this.userRoles, 'CONTENT_REVIEWER') !== -1) {
-     contentType = _.without(this.config.appConfig.WORKSPACE.contentType, 'TextBook');
+      contentType = _.without(this.config.appConfig.WORKSPACE.contentType, 'TextBook');
     }
     if (_.indexOf(this.userRoles, 'CONTENT_REVIEWER') !== -1 &&
       _.indexOf(this.userRoles, 'BOOK_REVIEWER') !== -1) {
-        contentType = this.config.appConfig.WORKSPACE.contentType;
+      contentType = this.config.appConfig.WORKSPACE.contentType;
     }
     return contentType;
   }

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditorService } from './../../services';
-import { ContentService, PublicDataService, UserService } from '@sunbird/core';
-import { ConfigService, ServerResponse, IUserProfile, IUserData, ToasterService } from '@sunbird/shared';
+import { PublicDataService, UserService, PlayerService } from '@sunbird/core';
+import { ConfigService, IUserProfile, IUserData, ToasterService, ContentData, PlayerConfig } from '@sunbird/shared';
 import { TeachingPackService } from '../../services';
 import * as _ from 'lodash';
 // import { ConfigService } from 'src/app/modules/shared';
@@ -14,6 +14,11 @@ import * as _ from 'lodash';
 export class ReviewTeachingPackComponent implements OnInit {
 
   public userProfile: IUserProfile;
+  contentData: ContentData;
+  playerConfig: PlayerConfig;
+  public playerService: PlayerService;
+  public stageId: string;
+  public playerLoaded = false;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -22,8 +27,11 @@ export class ReviewTeachingPackComponent implements OnInit {
     public configService: ConfigService,
     private userService: UserService,
     public teachingPackService: TeachingPackService,
-    private toasterService: ToasterService
-  ) { }
+    private toasterService: ToasterService,
+    playerService: PlayerService
+  ) {
+    this.playerService = playerService;
+  }
   padagogyFlow: any;
   contentId: string;
   collectionDetails: {};
@@ -33,9 +41,18 @@ export class ReviewTeachingPackComponent implements OnInit {
   topicName: string;
   showLoader = true;
   planChildrens = [];
+  previewType = '';
+  showCommentBoxClass = 'twelve wide column';
+  
+  showError = false;
+  errorMessage: string;
+  someFlag = false;
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.contentId = params['contentId'];
+    });
+    this.activatedRoute.queryParams.subscribe(params => {
+      this.previewType = params['type'];
     });
     this.userService.userData$.subscribe(
       (user: IUserData) => {
@@ -65,7 +82,6 @@ export class ReviewTeachingPackComponent implements OnInit {
       const children = _.filter(this.collectionDetails['children'], ['contentType', 'TeacherAidUnit']);
       _.forEach(this.padagogySteps, (item) => {
         _.forEach(children, (item2) => {
-          console.log('item222', item2);
           if (item.name === item2.pedagogyStep) {
             item['info'] = item2;
             const request = {
@@ -76,7 +92,6 @@ export class ReviewTeachingPackComponent implements OnInit {
               }
             };
             this.publicDataService.get(request).subscribe((response) => {
-              console.log('response for childrem', response);
               if (response.responseCode === 'OK') {
                 item['body'] = response.result['content']['body'];
                 item['children'] = response.result['content']['children'];
@@ -89,7 +104,13 @@ export class ReviewTeachingPackComponent implements OnInit {
   }
 
   goToReviewSubmissions() {
-    this.router.navigate(['workspace/content/review', 1]);
+    if (this.previewType === 'creator') {
+      this.router.navigate(['workspace/new/teachingpack', this.contentId]);
+    } else if (this.previewType === 'reviewer') {
+      this.router.navigate(['workspace/content/upForReview', 1]);
+    } else {
+      this.router.navigate(['workspace/content/review', 1]);
+    }
   }
 
   publishContent() {
@@ -105,7 +126,7 @@ export class ReviewTeachingPackComponent implements OnInit {
       }
     };
     this.publicDataService.post(req).subscribe((res) => {
-      this.router.navigate(['workspace/content/teachingpack', 1]);
+      this.router.navigate(['workspace/content/upForReview', 1]);
     }, (err) => {
       this.showLoader = false;
       this.toasterService.error(err.error.params.errmsg);
@@ -125,11 +146,60 @@ export class ReviewTeachingPackComponent implements OnInit {
       }
     };
     this.publicDataService.post(req).subscribe((res) => {
-      console.log('reject content', res);
-      this.router.navigate(['workspace/content/teachingpack', 1]);
+      this.router.navigate(['workspace/content/upForReview', 1]);
     }, (err) => {
       this.showLoader = false;
       this.toasterService.error(err.error.params.errmsg);
     });
+  }
+  dismissImageUploadModal() {
+    this.someFlag = false;
+  }
+  getContent(contentId) {
+    this.showLoader = true;
+    const option = {
+      params: { mode: 'edit' }
+    };
+    this.playerService.getContent(contentId, option).subscribe(
+      (response) => {
+        if (response.result.content) {
+          const contentDetails = {
+            contentId: contentId,
+            contentData: response.result.content
+          };
+          this.playerConfig = this.playerService.getConfig(contentDetails);
+          this.playerConfig.data = this.playerService.updateContentBodyForReviewer(this.playerConfig.data);
+          this.contentData = response.result.content;
+          // this.setInteractEventData();
+          this.showCommentBoxClass = this.contentData.mimeType ===
+            'application/vnd.ekstep.ecml-archive' ? 'twelve wide column' : 'twelve wide column';
+          this.showLoader = false;
+          this.someFlag = true;
+        } else {
+          this.toasterService.warning('ssa');
+          // this.close();
+        }
+      },
+      (err) => {
+        this.showError = true;
+        this.errorMessage = 'dad';
+      });
+  }
+
+  public contentProgressEvent(event) {
+    if (_.get(event, 'detail.telemetryData.eid') === 'END') {
+      this.stageId = undefined;
+    }
+  }
+  public handleReviewCommentEvent(event) {
+    // this.commentList = event;
+  }
+  public handleSceneChangeEvent(data) {
+    if (this.stageId !== data.stageId) {
+      this.stageId = data.stageId;
+    }
+    if (!this.playerLoaded) {
+      this.playerLoaded = true;
+    }
   }
 }

@@ -189,4 +189,8 @@ export class CreateTeachingPackComponent implements OnInit {
       }, 2000);
     });
   }
+
+  previewTeachingPack() {
+    this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/preview'], { queryParams: { type: 'creator' } });
+  }
 }
