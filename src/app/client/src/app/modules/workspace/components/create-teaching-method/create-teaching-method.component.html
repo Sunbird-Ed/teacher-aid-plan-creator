@@ -14,7 +14,7 @@
   <div class="ui grid">
     <div class="one wide column"></div>
     <div class="ten wide stretched column">
-      <div class="ui">
+      <!-- <div class="ui">
         <div class="actions actions margin-top-15">
           <button [disabled]="!myForm.valid" (click)="updateMethodData()" class="ui primary right floated  button">
             <i class="cloud upload icon"></i>
@@ -24,7 +24,7 @@
             Add Resource
           </div>
         </div>
-      </div>
+      </div> -->
       <div class="ui segment">
         <h3 class="ui header">
           <i class="pencil alternate icon"></i>
@@ -61,7 +61,7 @@
               <div class="twelve wide column">
                 <div class="field">
                   <label>
-                    Short Description
+                    Short Instructions
                   </label>
                   <div class="field">
                     <input required name="shortDescription" [(ngModel)]="methodDetails.methodDescription" type="text">
@@ -71,7 +71,7 @@
               <div class="twelve wide column">
                 <div class="field">
                   <label>
-                    Long Description
+                    Detailed Instructions
                   </label>
                   <div class="field margin-top-15">
                     <button (click)="initializeImagePicker()" class="ui icon button insert-image-btn">
@@ -117,6 +117,23 @@
   </div>
 </div>
 
+<div class="ui bottom fixed menu">
+  <div class="ui container p-10">
+    <div class="right menu">
+      <div class="item">
+        <div (click)="initializeResourcePicker()" class="ui primary right floated  button">
+          Add Resource
+        </div>
+      </div>
+      <div class="item">
+        <button [disabled]="!myForm.valid" (click)="updateMethodData()" class="ui primary button">
+          <i class="cloud upload icon"></i>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissResourcePicker()" *ngIf="showResourcePicker"
   [size]="'large'" [isFullScreen]="false" [mustScroll]="true" #modal2>
   <div class="header">Add Resource</div>
@@ -170,9 +187,9 @@
       </div>
     </div>
     <ng-template #noResorce>
-       <div class="text-center">
-         No Resource Found 
-       </div>
+      <div class="text-center">
+        No Resource Found
+      </div>
     </ng-template>
   </div>
   <div class="actions">

@@ -462,7 +462,7 @@ export class CreateTeachingMethodComponent implements OnInit {
       toolbar: ['heading', '|', 'bold', '|', 'italic', '|',
         'bulletedList', '|', 'numberedList', '|', 'insertTable', '|'],
       image: {
-        toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:full', 'imageStyle:alignRight'],
+        toolbar: ['imageTextAlternative', '|', 'imageStyle:full', 'imageStyle:alignRight'],
         styles: ['full', 'alignLeft', 'alignRight', 'side', 'alignCenter']
       },
       removePlugins: ['ImageCaption'],

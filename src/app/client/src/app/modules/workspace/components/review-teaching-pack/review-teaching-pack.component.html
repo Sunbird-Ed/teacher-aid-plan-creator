@@ -1,4 +1,4 @@
-<div>
+<div class="review-container">
   <div class="ui fixed main menu bs-0 main-header d-block">
     <div class="ui container primary-header p-10">
       <div role="banner" class="ui logo d-flex flex-ai-center">
@@ -18,14 +18,14 @@
         <app-loader></app-loader>
       </div>
       <div *ngIf="!showLoader" class="ten wide stretched column">
-        <div class="actions actions margin-top-15" *ngIf="previewType === 'reviewer'">
+        <!-- <div class="actions actions margin-top-15" *ngIf="previewType === 'reviewer'">
           <div (click)="publishContent()" class="ui primary right floated  button">
             Publish
           </div>
           <div (click)="rejectContent()" class="ui primary right floated  button">
             Reject
           </div>
-        </div>
+        </div> -->
         <div class="ui segment">
           <div class="twelve wide column">
             <div class="ui header">{{lessonName}}</div>
@@ -54,12 +54,12 @@
                       </div>
                       <div class="text">
                         <div *ngIf="step.info?.description">
-                          <label class="author">Short Description :</label>
+                          <label class="author">Short Instructions :</label>
                           <p class="text">{{step.info?.description}}</p>
                         </div>
                         <div *ngIf="step.body">
-                          <label class="author">Long Description :</label>
-                          <div class="text long-description" *ngIf="step.body" [innerHTML]="step.body"></div>
+                          <label class="author">Detailed Instructions :</label>
+                          <div class="text long-description" [innerHTML]="step.body"></div>
                         </div>
                       </div>
                     </div>
@@ -68,17 +68,23 @@
                 <div class="ui stacked segments" *ngIf="step.children?.length > 0">
                   <div class="ui segment">
                     <h2 class="ui small header">Resources</h2>
-                  </div>
-                  <div *ngFor="let resource of step.children" class="ui raised segment">
-                    <div class="ui grid">
-                      <div class="three wide column">
-                        <img class="ui tiny image" [src]="resource.appIcon ? resource.appIcon : 'assets/images/default.png'">
-                      </div>
-                      <div class="nine wide column">
-                        <h3 class="ui tiny header">{{resource.name}}
-                        </h3>
+                    <div class="ui divided items" *ngIf="step.children?.length > 0">
+                      <div class="ui item" *ngFor="let resource of step.children">
+                        <div class="ui tiny image">
+                          <img [src]="resource.appIcon ? resource.appIcon : 'assets/images/default.png'">
+                        </div>
                         <div class="content">
-                          {{resource.description}}
+                          <div class="header">
+                            {{resource.name}}
+                          </div>
+                          <div class="description">
+                            <p>{{resource.description}}</p>
+                          </div>
+                          <div class="extra">
+                            <div (click)="getContent(resource.identifier)" class="ui right floated primary basic button">
+                              View
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -98,9 +104,21 @@
     </div>
   </div>
 </div>
+<div class="ui bottom fixed menu" *ngIf="previewType === 'reviewer'">
+  <div class="ui container p-10">
+    <div class="right menu">
+      <div class="item">
+        <div (click)="rejectContent()" class="ui button">Reject</div>
+      </div>
+      <div class="item">
+        <div (click)="publishContent()" class="ui primary button">Publish</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissImageUploadModal()" *ngIf="someFlag" [size]="'normal'"
-  [isFullScreen]="false" [mustScroll]="true" #modal3>
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissViewResourceModal()" *ngIf="showResourcePlayer"
+  [size]="'normal'" [isFullScreen]="false" [mustScroll]="true" #modal3>
   <div class="header">View Resource</div>
   <div class="content">
     <div class="ui grid">
@@ -112,7 +130,7 @@
   </div>
   <div class="actions">
     <div class="ui floated buttons">
-      <button (click)="dismissImageUploadModal();" class="ui primary button">Back</button>
+      <button (click)="dismissViewResourceModal();" class="ui primary button">Close</button>
     </div>
   </div>
 </sui-modal>

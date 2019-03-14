@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditorService } from './../../services';
 import { PublicDataService, UserService, PlayerService } from '@sunbird/core';
-import { ConfigService, IUserProfile, IUserData, ToasterService, ContentData, PlayerConfig } from '@sunbird/shared';
+import { ConfigService, IUserProfile, IUserData, ToasterService, ContentData, PlayerConfig, ResourceService } from '@sunbird/shared';
 import { TeachingPackService } from '../../services';
 import * as _ from 'lodash';
 // import { ConfigService } from 'src/app/modules/shared';
@@ -19,6 +19,7 @@ export class ReviewTeachingPackComponent implements OnInit {
   public playerService: PlayerService;
   public stageId: string;
   public playerLoaded = false;
+  public resourceService: ResourceService;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -28,9 +29,11 @@ export class ReviewTeachingPackComponent implements OnInit {
     private userService: UserService,
     public teachingPackService: TeachingPackService,
     private toasterService: ToasterService,
-    playerService: PlayerService
+    playerService: PlayerService,
+    resourceService: ResourceService
   ) {
     this.playerService = playerService;
+    this.resourceService = resourceService;
   }
   padagogyFlow: any;
   contentId: string;
@@ -43,10 +46,10 @@ export class ReviewTeachingPackComponent implements OnInit {
   planChildrens = [];
   previewType = '';
   showCommentBoxClass = 'twelve wide column';
-  
+
   showError = false;
   errorMessage: string;
-  someFlag = false;
+  showResourcePlayer = false;
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.contentId = params['contentId'];
@@ -80,10 +83,13 @@ export class ReviewTeachingPackComponent implements OnInit {
       this.topicName = this.collectionDetails['topics'];
       this.padagogySteps = JSON.parse(this.collectionDetails['pedagogySteps']);
       const children = _.filter(this.collectionDetails['children'], ['contentType', 'TeacherAidUnit']);
+      console.log('assssssssssss', children);
       _.forEach(this.padagogySteps, (item) => {
+        console.log('itemmmmmmmmm', item);
         _.forEach(children, (item2) => {
           if (item.name === item2.pedagogyStep) {
             item['info'] = item2;
+            item['children'] = item2['children'];
             const request = {
               url: `${this.configService.urlConFig.URLS.CONTENT.GET}/${item2.identifier}`,
               param: {
@@ -94,7 +100,6 @@ export class ReviewTeachingPackComponent implements OnInit {
             this.publicDataService.get(request).subscribe((response) => {
               if (response.responseCode === 'OK') {
                 item['body'] = response.result['content']['body'];
-                item['children'] = response.result['content']['children'];
               }
             });
           }
@@ -152,11 +157,11 @@ export class ReviewTeachingPackComponent implements OnInit {
       this.toasterService.error(err.error.params.errmsg);
     });
   }
-  dismissImageUploadModal() {
-    this.someFlag = false;
+  dismissViewResourceModal() {
+    this.showResourcePlayer = false;
   }
   getContent(contentId) {
-    this.showLoader = true;
+    // this.showLoader = true;
     const option = {
       params: { mode: 'edit' }
     };
@@ -174,15 +179,15 @@ export class ReviewTeachingPackComponent implements OnInit {
           this.showCommentBoxClass = this.contentData.mimeType ===
             'application/vnd.ekstep.ecml-archive' ? 'twelve wide column' : 'twelve wide column';
           this.showLoader = false;
-          this.someFlag = true;
+          this.showResourcePlayer = true;
         } else {
-          this.toasterService.warning('ssa');
+          this.toasterService.warning(this.resourceService.messages.imsg.m0027);
           // this.close();
         }
       },
       (err) => {
         this.showError = true;
-        this.errorMessage = 'dad';
+        this.errorMessage = this.resourceService.messages.stmsg.m0009;
       });
   }
 
