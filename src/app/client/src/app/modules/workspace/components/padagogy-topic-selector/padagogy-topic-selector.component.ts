@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FrameworkService } from '@sunbird/core';
 import { ToasterService, ResourceService, Framework } from '@sunbird/shared';
-import { PublicDataService, SearchService, FormService, UserService } from '@sunbird/core';
+import { PublicDataService, FormService, UserService } from '@sunbird/core';
 import { ConfigService, ServerResponse, IUserData, IUserProfile } from '@sunbird/shared';
 import * as _ from 'lodash';
 import { CacheService } from 'ng2-cache-service';
@@ -18,10 +18,21 @@ import { EditorService } from './../../services';
 export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
   @ViewChild('modal') modal;
   @ViewChild('formData') formData: DefaultTemplateComponent;
+  /**
+   * to call the framework services which gives framework related data
+   */
   public frameworkService: FrameworkService;
+
   public framework: string;
-  private searchService: SearchService;
+
+  /**
+   * to call editor service
+   */
   private editorService: EditorService;
+
+  /**
+   * user profile info
+   */
   public userProfile: IUserProfile;
   /**
   * To show toaster(error, success etc) after any API calls
@@ -43,8 +54,16 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
   */
   public configService: ConfigService;
 
+  /**
+   * to call public data service
+   */
   public publicDataService: PublicDataService;
+
+  /**
+   * master list of user framwork categories
+   */
   public categoryMasterList: any;
+
   public formService: FormService;
   public isCachedDataExists: boolean;
   public contentType;
@@ -65,7 +84,6 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     toasterService: ToasterService,
     resourceService: ResourceService,
     publicDataService: PublicDataService,
-    searchService: SearchService,
     configService: ConfigService,
     formService: FormService,
     private _cacheService: CacheService,
@@ -77,7 +95,6 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     this.resourceService = resourceService;
     this.publicDataService = publicDataService;
     this.configService = configService;
-    this.searchService = searchService;
     this.formService = formService;
     this.contentType = 'teachingaid';
     this.editorService = editorService;
@@ -120,9 +137,10 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     }
   }
 
-
+  /**
+   * function to get user framework metadata
+   */
   fetchFrameworkMetaData() {
-
     this.frameworkService.frameworkData$.subscribe((frameworkData: Framework) => {
       if (!frameworkData.err) {
         this.categoryMasterList = _.cloneDeep(frameworkData.frameworkdata['defaultFramework'].categories);
@@ -169,6 +187,9 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * function to get form fields for creating teaching pack
+   */
   getFormConfig() {
     _.forEach(this.categoryMasterList, (category) => {
       _.forEach(this.formFieldProperties, (formFieldCategory) => {
@@ -186,14 +207,16 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * function to navigate to teaching pack list
+   */
   goToTeachingPack() {
     this.router.navigate(['workspace/content/teachingpack', 1]);
   }
 
-  // startCreating() {
-  //   this.router.navigate(['workspace/new/teachingpack', 'do_12343324']);
-  // }
-
+  /**
+   * function to show pedagoy flow selection screen
+   */
   goToPedagogyScreen() {
     this.filterTopics();
     this.padagogyList.map((item) => {
@@ -205,14 +228,20 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
         }
       });
     });
-    console.log('padagogyList', this.padagogyList);
     this.showPadagogySelector = true;
   }
 
+  /**
+   * function to show topic selection screen
+   */
   goToTopicScreen() {
     this.showPadagogySelector = false;
     this.showTopicSelector = true;
   }
+
+  /**
+   * function to filter topics based upon board/grade/subject/medium
+   */
   filterTopics() {
     const content = _.pickBy(this.formData.formInputData);
     this.formContent = _.pickBy(this.formData.formInputData);
@@ -319,6 +348,9 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     return associatedTopics;
   }
 
+  /**
+   * function to create teaching pack
+   */
   createContent() {
     const requestData = {
       content: this.generateData(this.formContent)
@@ -330,8 +362,11 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * function to generete form data for a teaching pack
+   * @param data form data filled/selected by user
+   */
   generateData(data) {
-
     const requestData = _.cloneDeep(data);
     requestData['gradeLevel'] = [requestData['gradeLevel']];
     requestData['name'] = 'Untitled',
@@ -353,10 +388,13 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
     return requestData;
   }
 
+
+  /**
+   * functio to search topic
+   * @param {string} keyword search keyword
+  */
   searchTopic = (keyword) => {
     this.seachTopicString = keyword.target.value;
-    console.log('search string', keyword);
-    console.log('this.topics', this.topics);
     const result = [];
     if (this.seachTopicString.length) {
       for (let i = 0; i < this.topics.length; i++) {
@@ -409,7 +447,6 @@ export class PadagogyTopicSelectorComponent implements OnInit, OnDestroy {
         }
       });
     }
-    console.log('this.filteredTopics', this.filteredTopics);
   }
 }
 

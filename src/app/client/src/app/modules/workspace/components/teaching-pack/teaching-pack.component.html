@@ -2,20 +2,17 @@
 <div class="twelve wide column mt-20" *ngIf="showLoader ">
   <app-loader [data]="loaderMessage"></app-loader>
 </div>
-<div *ngIf="noResult && !showLoader">
-  <app-no-result [data]="noResultMessage"></app-no-result>
-</div>
 <div routerLink="selecttopic" class="ui right aligned basic segment">
   <div class="ui primary button">CREATE NEW</div>
 </div>
-
+<div *ngIf="noResult && !showLoader">
+  <app-no-result [data]="noResultMessage"></app-no-result>
+</div>
 <table class="ui upForReviewTable table" *ngIf="allContent.length > 0 && !showLoader && !noResult ">
   <thead>
     <tr>
       <th class="nine wide UpReviewTableHeader">Topic
       </th>
-      <!-- <th class="four wide UpReviewTableHeader">{{ resourceService?.frmelmnts?.lbl?.lastupdatedCaps}}
-      </th> -->
       <th class="three wide UpReviewTableHeader">{{ resourceService?.frmelmnts?.lbl?.status}}
       </th>
       <th class="two wide UpReviewTableHeader">
@@ -31,7 +28,6 @@
       [telemetryInteractEdata]="{id:'allcontent',type:'click',pageid:'AllContent'}">
       <td (click)="contentClick(content)">
         <h5 class="ui image header">
-          <!-- <img src="{{content.appIcon || 'assets/images/default.png' | cdnprefixurl}}" class="ui tiny image UpReviewTinyImage"> -->
           <div class="content ">
             <div class="UpReviewHeader">{{content.topics ? content.topics : content.name | slice:0:40}}
               <i *ngIf="content.name.length > 40">...</i>

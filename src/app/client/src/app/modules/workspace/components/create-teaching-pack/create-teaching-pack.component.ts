@@ -24,14 +24,45 @@ export class CreateTeachingPackComponent implements OnInit {
     public teachingPackService: TeachingPackService,
     private toasterService: ToasterService
   ) { }
-  padagogyFlow: any;
+
+  /**
+   * identifier of the lesson plan
+   */
   contentId: string;
+
+  /**
+   * details of the lesson plan
+   */
   collectionDetails: {};
+
+  /**
+   * name of the lesson plan
+   */
   lessonName: string;
+
+  /**
+   * description of the lesson plan
+   */
   lessonDescription: string;
+
+  /**
+   * pedagogy steps of the pedagogy flow selected for the plan
+   */
   padagogySteps = [];
+
+  /**
+   * topic name
+   */
   topicName: string;
+
+  /**
+   * To show / hide loader
+  */
   showLoader = true;
+
+  /**
+   * teaching methods of the teaching plan
+   */
   planChildrens = [];
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
@@ -46,9 +77,11 @@ export class CreateTeachingPackComponent implements OnInit {
     this.getCollectionDetails();
   }
 
+  /**
+   * This method is used to get details of the lesson plan
+   */
   getCollectionDetails() {
     const options: any = { params: {} };
-    // options.params.mode = 'edit';
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.contentId}`,
       param: { mode: 'edit' }
@@ -74,6 +107,13 @@ export class CreateTeachingPackComponent implements OnInit {
     });
   }
 
+
+  /**
+   * Function to update lesson plan details
+   * @param {boolean} goToMethod flag for navigation after save
+   * @param {number} methodId id of the lesson plan
+   * @param {fromReview} goToMethod flag for navigation after save
+   */
   updatePlanMetaData(goToMethod, methodId, fromReview = false) {
     this.showLoader = true;
     const req = {
@@ -102,7 +142,12 @@ export class CreateTeachingPackComponent implements OnInit {
     });
   }
 
+  /**
+   * Function to add/view teaching method of a plan
+   * @param {object} step pedagogy step for which method is being added
+   */
   addNewMethod(step) {
+    this.updatePlanMetaData(false, this.contentId, true);
     if (!!step.info && !!step.info.identifier) {
       const methodId = step.info.identifier;
       this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/teachingmethod'],
@@ -119,6 +164,10 @@ export class CreateTeachingPackComponent implements OnInit {
     }
   }
 
+  /**
+   * Function to update the hierarchy of the lesson plan
+   * @param {number} methodId identifier of the plan
+   */
   updateLessonPlanHierarchy(methodId) {
     const req = {
       url: `action/${this.configService.urlConFig.URLS.CONTENT.UPDATE_HIERARCHY}`,
@@ -142,23 +191,32 @@ export class CreateTeachingPackComponent implements OnInit {
         { queryParams: { methodId: methodId } });
     });
   }
+
+  /**
+  * Function to navigate to teaching pack list
+  */
   goToPacks() {
     this.router.navigate(['workspace/content/teachingpack', 1]);
   }
 
+  /**
+  * Function to generate form data for teaching method
+  * @param {string} stepName pedagogy step name for which method will be added
+  */
   generateData(stepName) {
     const requestData = {};
     requestData['pedagogyStep'] = stepName;
-    requestData['name'] = 'Untitled',
-      requestData['createdBy'] = this.userProfile.id,
-      requestData['organisation'] = this.userProfile.organisationNames,
-      requestData['createdFor'] = this.userProfile.organisationIds,
-      requestData['contentType'] = 'TeacherAidUnit',
-      requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
+    requestData['name'] = 'Untitled';
+    requestData['createdBy'] = this.userProfile.id;
+    requestData['organisation'] = this.userProfile.organisationNames;
+    requestData['createdFor'] = this.userProfile.organisationIds;
+    requestData['contentType'] = 'TeacherAidUnit';
+    requestData['mimeType'] = this.configService.urlConFig.URLS.CONTENT_COLLECTION;
     requestData['board'] = this.collectionDetails['board'];
     requestData['gradeLevel'] = this.collectionDetails['gradeLevel'];
     requestData['subject'] = this.collectionDetails['subject'];
     requestData['medium'] = this.collectionDetails['medium'];
+    requestData['topicName'] = this.topicName;
     if (!_.isEmpty(this.userProfile.lastName)) {
       requestData['creator'] = this.userProfile.firstName + ' ' + this.userProfile.lastName;
     } else {
@@ -167,6 +225,9 @@ export class CreateTeachingPackComponent implements OnInit {
     return requestData;
   }
 
+  /**
+  * Function to submit the teaching pack for review
+  */
   submitForReview() {
     this.showLoader = true;
     this.updatePlanMetaData(false, this.contentId, true);
@@ -190,6 +251,9 @@ export class CreateTeachingPackComponent implements OnInit {
     });
   }
 
+  /**
+   * Function to go to preview lesson plan page
+   */
   previewTeachingPack() {
     this.router.navigate(['workspace/new/teachingpack/' + this.contentId + '/preview'], { queryParams: { type: 'creator' } });
   }

@@ -23,7 +23,7 @@
             <div class="workspacesegment pusher wide column">
               <h4 class="ui header">
                 <div class="content">
-                  {{topicName}}
+                 {{topicName}}
                 </div>
               </h4>
               <form class="ui form">
@@ -76,27 +76,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- <div class="ui grid">
-                <div class="four wide column" *ngFor="let step of padagogySteps">
-                  <div class="ui card" [ngClass]="{'green' : step.hasMethod }">
-                    <div class="ui sub header content">
-                      <div class="center aligned description">
-                        <p>{{step.name}}</p>
-                      </div>
-                    </div>
-                    <div class="extra content">
-                      <div class="center aligned author">
-                        <div class="ui bottom attached button" (click)="addNewMethod(step.name, step.hasMethod)">
-                          <i *ngIf="!step.hasMethod" class="add icon"></i>
-                          <i *ngIf="step.hasMethod" class="edit icon"></i>
-                          {{step.info?.identifier ? 'Edit Method' : 'Add Method' }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
               <div class="actions actions margin-top-15">
                 <div (click)="updatePlanMetaData()" class="ui primary right floated  button">
                   <i class="cloud upload icon"></i>
@@ -107,7 +86,7 @@
                 </div>
                 <div (click)="previewTeachingPack()" class="ui primary right floated  button">
                   Preview
-                </div>  
+                </div>
               </div>
             </div>
           </div>

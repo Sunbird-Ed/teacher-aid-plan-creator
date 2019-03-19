@@ -14,22 +14,11 @@
   <div class="ui grid">
     <div class="one wide column"></div>
     <div class="ten wide stretched column">
-      <!-- <div class="ui">
-        <div class="actions actions margin-top-15">
-          <button [disabled]="!myForm.valid" (click)="updateMethodData()" class="ui primary right floated  button">
-            <i class="cloud upload icon"></i>
-            Save
-          </button>
-          <div (click)="initializeResourcePicker()" class="ui primary right floated  button">
-            Add Resource
-          </div>
-        </div>
-      </div> -->
       <div class="ui segment">
         <h3 class="ui header">
-          <i class="pencil alternate icon"></i>
           <div class="content">
-            Teaching Method
+            <span *ngIf="topicName">{{topicName}} - </span>
+            {{collectionDetails.pedagogyStep}}
           </div>
         </h3>
         <form #myForm="ngForm" class="ui form">

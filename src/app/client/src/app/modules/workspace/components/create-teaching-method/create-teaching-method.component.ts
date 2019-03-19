@@ -38,20 +38,63 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.toasterService = toasterService;
     this.resourceService = resourceService;
   }
+  /**
+   * page no for resource lazy load
+   */
   pageNo = 1;
+
+  /**
+   * list of images uploaded by me
+   */
   myAssets = [];
+
+  /**
+   * list of resources
+   */
   myResources = [];
+
+  /**
+   * list of all images
+   */
   allImages = [];
+
+  /**
+   * modal for ck editor
+   */
   editorData: any;
+
+  /**
+   * identifier for the lesson plan
+   */
   contentId: string;
+
+  /**
+   * identifier for the teching method
+   */
   methodId: string;
+
+  /**
+   * details of teaching method
+   */
   collectionDetails = {};
+
+  /**
+   * list of resources associated with method
+   */
   associatedResources = [];
+
+  /**
+   * method details
+   */
   methodDetails = {
     selectedMethod: '',
     methodDuration: '',
     methodDescription: ''
   };
+
+  /**\
+   * list of teaching methods
+   */
   teachingMethodList = [
     {
       'id': 1,
@@ -109,25 +152,25 @@ export class CreateTeachingMethodComponent implements OnInit {
       'id': 14,
       'name': 'Questioning'
     },
-    {
-      'id': 15,
-      'name': 'Choral response'
-    },
-    {
-      'id': 16,
-      'name': 'Whole-class sharing'
-    },
-    {
-      'id': 17,
-      'name': 'Directed reading questioning'
-    },
+    // {
+    //   'id': 15,
+    //   'name': 'Choral response'
+    // },
+    // {
+    //   'id': 16,
+    //   'name': 'Whole-class sharing'
+    // },
+    // {
+    //   'id': 17,
+    //   'name': 'Directed reading questioning'
+    // },
     {
       'id': 18,
       'name': 'Reading for Meaning'
     },
     {
       'id': 19,
-      'name': 'Problem-solving'
+      'name': 'Problem solving'
     },
     {
       'id': 20,
@@ -145,10 +188,10 @@ export class CreateTeachingMethodComponent implements OnInit {
       'id': 23,
       'name': 'Demonstration'
     },
-    {
-      'id': 24,
-      'name': 'Animation demonstration'
-    },
+    // {
+    //   'id': 24,
+    //   'name': 'Animation demonstration'
+    // },
     {
       'id': 25,
       'name': 'Grade-as-you-go'
@@ -201,10 +244,10 @@ export class CreateTeachingMethodComponent implements OnInit {
       'id': 37,
       'name': 'Directed Reading Thinking Activity'
     },
-    {
-      'id': 38,
-      'name': 'Survey-question-read-recite-review'
-    },
+    // {
+    //   'id': 38,
+    //   'name': 'Survey-question-read-recite-review'
+    // },
     {
       'id': 39,
       'name': 'Pair activity'
@@ -297,10 +340,10 @@ export class CreateTeachingMethodComponent implements OnInit {
       'id': 61,
       'name': 'Essay writing'
     },
-    {
-      'id': 62,
-      'name': 'Sufi song'
-    },
+    // {
+    //   'id': 62,
+    //   'name': 'Sufi song'
+    // },
     {
       'id': 63,
       'name': 'Picture-based inference'
@@ -309,10 +352,10 @@ export class CreateTeachingMethodComponent implements OnInit {
       'id': 64,
       'name': 'Map-based inference'
     },
-    {
-      'id': 65,
-      'name': 'Travel brochures'
-    },
+    // {
+    //   'id': 65,
+    //   'name': 'Travel brochures'
+    // },
     {
       'id': 66,
       'name': 'Map work'
@@ -321,14 +364,14 @@ export class CreateTeachingMethodComponent implements OnInit {
       'id': 67,
       'name': 'Word web'
     },
-    {
-      'id': 68,
-      'name': 'Inside-outside circle'
-    },
-    {
-      'id': 69,
-      'name': 'Popcorn reading'
-    },
+    // {
+    //   'id': 68,
+    //   'name': 'Inside-outside circle'
+    // },
+    // {
+    //   'id': 69,
+    //   'name': 'Popcorn reading'
+    // },
     {
       'id': 70,
       'name': 'Round-robin'
@@ -363,12 +406,12 @@ export class CreateTeachingMethodComponent implements OnInit {
     },
     {
       'id': 78,
-      'name': 'Story'
+      'name': 'Storytelling'
     },
-    {
-      'id': 121,
-      'name': 'Free choice play'
-    },
+    // {
+    //   'id': 121,
+    //   'name': 'Free choice play'
+    // },
     {
       'id': 122,
       'name': 'Circle time'
@@ -376,19 +419,177 @@ export class CreateTeachingMethodComponent implements OnInit {
     {
       'id': 123,
       'name': 'Wrapping up'
+    },
+    {
+      'id': 124,
+      'name': 'Discussion'
+    },
+    {
+      'id': 125,
+      'name': 'Music'
+    },
+    {
+      'id': 126,
+      'name': 'Blackboard'
+    },
+    {
+      'id': 127,
+      'name': 'Lecture explanation'
+    },
+    {
+      'id': 128,
+      'name': 'Picture / Illustration'
+    },
+    {
+      'id': 129,
+      'name': 'Cinema'
+    },
+    {
+      'id': 130,
+      'name': 'Videos'
+    },
+    {
+      'id': 131,
+      'name': 'Comparison'
+    },
+    {
+      'id': 132,
+      'name': 'Mind Mapping'
+    },
+    {
+      'id': 133,
+      'name': 'Game'
+    },
+    {
+      'id': 133,
+      'name': 'Puzzles'
+    },
+    {
+      'id': 134,
+      'name': 'Case study'
+    },
+    {
+      'id': 135,
+      'name': 'Manipulative'
+    },
+    {
+      'id': 136,
+      'name': 'Peer learing'
+    },
+    {
+      'id': 137,
+      'name': 'Reading Activity'
+    },
+    {
+      'id': 138,
+      'name': 'PowerPoint'
+    },
+    {
+      'id': 139,
+      'name': 'Hands-on activity'
+    },
+    {
+      'id': 139,
+      'name': 'Writing exercise'
+    },
+    {
+      'id': 140,
+      'name': 'Field visit'
+    },
+    {
+      'id': 141,
+      'name': 'Worksheets'
+    },
+    {
+      'id': 142,
+      'name': 'Rhymes'
+    },
+    {
+      'id': 143,
+      'name': 'Pronunciation'
+    },
+    {
+      'id': 144,
+      'name': 'Questions (oral)'
+    },
+    {
+      'id': 145,
+      'name': 'Questions (written)'
+    },
+    {
+      'id': 146,
+      'name': 'Questions (activity based)'
+    },
+    {
+      'id': 147,
+      'name': 'Online Interaction'
+    },
+    {
+      'id': 148,
+      'name': 'Custom Method'
+    },
+    {
+      'id': 149,
+      'name': 'Project'
+    },
+    {
+      'id': 150,
+      'name': 'Audio'
+    },
+    {
+      'id': 149,
+      'name': 'Test / Assessment'
+    },
+    {
+      'id': 151,
+      'name': 'Plan'
     }
   ];
+
+  /**
+   * instance of ck editor
+   */
   editorinstance: any;
+
+  /**
+   * config for ck editor
+   */
   public config = {
     toolbar: {
       viewportTopOffset: 30
     }
   };
+
+  /**
+   * to show/hide resorce picker
+   */
   showResourcePicker: boolean;
+
+  /**
+   * to show/hide Image picker
+   */
   showImagePicker: boolean;
+
+  /**
+   * to show/hide Image uplpad modal
+   */
   showImageUploadModal: boolean;
+
+  /**
+   * to show/hide error message
+   */
   showErrorMsg: boolean;
+
+  /**
+   * error message
+   */
   errorMsg: string;
+
+  /**
+   * topic name
+   */
+  topicName: string;
+
   ngOnInit() {
     this.activatedRoute.params.subscribe(params => {
       this.contentId = params['contentId'];
@@ -404,18 +605,27 @@ export class CreateTeachingMethodComponent implements OnInit {
           this.userProfile = user.userProfile;
         }
       });
-    this.create();
+    this.createCKEditor();
   }
 
+  /**
+   * function to navigate back to teaching pack details
+   */
   goToPacks() {
     this.router.navigate(['workspace/new/teachingpack', this.contentId]);
   }
 
+  /**
+   * function to get method details
+   */
   getMethodDetails() {
     const options: any = { params: {} };
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET}/${this.methodId}`,
-      param: { mode: 'edit', fields: 'duration,methodtype,body,name,versionKey,description,board,gradeLevel,subject,medium,pedagogyStep' }
+      param: {
+        mode: 'edit',
+        fields: 'duration,methodtype,body,name,versionKey,description,board,gradeLevel,subject,medium,pedagogyStep,topicName'
+      }
     };
     const req2 = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.methodId}`,
@@ -431,12 +641,18 @@ export class CreateTeachingMethodComponent implements OnInit {
       this.methodDetails.methodDuration = this.collectionDetails['duration'];
       this.methodDetails.methodDescription = this.collectionDetails['description'];
       this.methodDetails.selectedMethod = this.collectionDetails['methodtype'];
+      if (this.collectionDetails['collections'] && this.collectionDetails['collections'].length) {
+        this.topicName = this.collectionDetails['collections'][0]['name'];
+      }
       // this.model.editorData = !!this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
       const editorData = !!this.collectionDetails['body'] ? this.collectionDetails['body'] : '';
       this.editorinstance.setData(editorData);
     });
   }
 
+  /**
+   * function to update method details
+   */
   updateMethodData() {
     const req = {
       url: `${this.configService.urlConFig.URLS.CONTENT.UPDATE}/${this.methodId}`,
@@ -457,7 +673,10 @@ export class CreateTeachingMethodComponent implements OnInit {
     });
   }
 
-  create() {
+  /**
+   * function to create instance of ck editor
+   */
+  createCKEditor() {
     this.Editor.create(document.querySelector('#editor'), {
       toolbar: ['heading', '|', 'bold', '|', 'italic', '|',
         'bulletedList', '|', 'numberedList', '|', 'insertTable', '|'],
@@ -474,7 +693,10 @@ export class CreateTeachingMethodComponent implements OnInit {
     });
   }
 
-
+  /**
+   * function to get images
+   * @param offset page no
+   */
   getMyImages(offset) {
     if (offset === 0) {
       this.myAssets.length = 0;
@@ -504,13 +726,18 @@ export class CreateTeachingMethodComponent implements OnInit {
     });
   }
 
+  /**
+   * function to open resource picker
+   */
   initializeResourcePicker() {
     this.showResourcePicker = true;
     if (this.pageNo === 1) {
       this.getResources();
     }
   }
-
+  /**
+   * function to get resources
+   */
   getResources() {
     const req = {
       url: `${this.configService.urlConFig.URLS.COMPOSITE.SEARCHV3}`,
@@ -541,22 +768,40 @@ export class CreateTeachingMethodComponent implements OnInit {
       });
     });
   }
+
+  /**
+   * function to hide resource picker
+   */
   dismissResourcePicker() {
     this.showResourcePicker = false;
   }
 
+  /**
+   * function to hide image picker
+   */
   dismissImagePicker() {
     this.showImagePicker = false;
   }
 
+  /**
+   * function to hide image upload modal
+   */
   dismissImageUploadModal() {
     this.showImagePicker = true;
     this.showImageUploadModal = false;
   }
+
+  /**
+   * function to show image upload modal
+   */
   initiateImageUploadModal() {
     this.showImagePicker = false;
     this.showImageUploadModal = true;
   }
+
+  /**
+   * function to add resource for method
+   */
   selectResource(item) {
     item['selected'] = !item['selected'];
     const recource = _.find(this.associatedResources, ['identifier', item.identifier]);
@@ -570,6 +815,9 @@ export class CreateTeachingMethodComponent implements OnInit {
     }
   }
 
+  /**
+   * function to remove already added resource for method
+   */
   removeResource(item) {
     const arr = _.remove(this.associatedResources, (res) => {
       return res.identifier !== item.identifier;
@@ -577,6 +825,10 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.associatedResources = [...arr];
     this.addResources();
   }
+
+  /**
+   * function to associate resource to the method
+   */
   addResources() {
     const children = [];
     _.map(this.associatedResources, (item) => {
@@ -603,6 +855,9 @@ export class CreateTeachingMethodComponent implements OnInit {
     });
   }
 
+  /**
+   * function to lazy load resources
+   */
   lazyloadResources() {
     if (this.myResources.length / 50 >= 1) {
       this.pageNo = Math.ceil(this.myResources.length / 50) + 1;
@@ -610,6 +865,9 @@ export class CreateTeachingMethodComponent implements OnInit {
     }
   }
 
+  /**
+   * function to update teaching pack details
+   */
   updateLessonPlan() {
     const req2 = {
       url: `${this.configService.urlConFig.URLS.CONTENT.GET_HIERARCHY}/${this.contentId}`,
@@ -643,10 +901,17 @@ export class CreateTeachingMethodComponent implements OnInit {
     });
   }
 
+  /**
+   * Function to show image picker
+   */
   initializeImagePicker() {
     this.showImagePicker = true;
   }
 
+  /**
+   * function to add images in ck editor
+   * @param imageUrl url of the image to be added in the editor
+   */
   addImageInEditor(imageUrl) {
     this.editorinstance.model.change(writer => {
       const imageElement = writer.createElement('image', {
@@ -657,6 +922,10 @@ export class CreateTeachingMethodComponent implements OnInit {
     this.showImagePicker = false;
   }
 
+  /**
+   * functio to get all images
+   * @param offset page no
+   */
   getAllImages(offset) {
     if (offset === 0) {
       this.allImages.length = 0;
@@ -684,15 +953,26 @@ export class CreateTeachingMethodComponent implements OnInit {
       });
     });
   }
+
+  /**
+   * function to lazy load my images
+   */
   lazyloadMyImages() {
     const offset = this.myAssets.length;
     this.getMyImages(offset);
   }
 
+  /**
+   * function to lazy load all images
+   */
   lazyloadAllImages() {
     const offset = this.allImages.length;
     this.getAllImages(offset);
   }
+
+  /**
+   * function to upload image
+   */
   uploadImage(event) {
     const file = event.target.files[0];
     const reader = new FileReader();
