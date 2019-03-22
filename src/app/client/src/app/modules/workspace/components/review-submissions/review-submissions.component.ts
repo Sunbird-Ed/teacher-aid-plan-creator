@@ -221,7 +221,13 @@ export class ReviewSubmissionsComponent extends WorkSpace implements OnInit {
     * This method launch the content editior
   */
   contentClick(param) {
-    this.workSpaceService.navigateToContent(param.data.metaData, this.state);
+    if (param.data.metaData.contentType === 'TeacherAid') {
+      const content = param.data.metaData;
+      content['userType'] = 'creatorReview';
+      this.workSpaceService.navigateToContent(content, this.state);
+    } else {
+      this.workSpaceService.navigateToContent(param.data.metaData, this.state);
+    }
   }
 
   /**

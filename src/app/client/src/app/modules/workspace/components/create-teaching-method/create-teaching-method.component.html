@@ -1,0 +1,258 @@
+<div class="ui fixed main menu bs-0 main-header d-block">
+  <div class="ui container primary-header p-10">
+    <div role="banner" class="ui logo d-flex flex-ai-center">
+      <a class="d-flex flex-ai-center">
+        <img class="image centered cursor-pointer" alt="sunbird" src="assets/images/sunbird_logo.png">
+      </a>
+    </div>
+    <div (click)="goToPacks()" class="circular ui icon button">
+      <i class="close icon"></i>
+    </div>
+  </div>
+</div>
+<div class="ui p-20">
+  <div class="ui grid">
+    <div class="one wide column"></div>
+    <div class="ten wide stretched column">
+      <div class="ui segment">
+        <h3 class="ui header">
+          <div class="content">
+            <span *ngIf="topicName">{{topicName}} - </span>
+            {{collectionDetails.pedagogyStep}}
+          </div>
+        </h3>
+        <form #myForm="ngForm" class="ui form">
+          <div class="content">
+            <div class="ui grid margin-bottom-15">
+              <div class="six wide column">
+                <div class="field">
+                  <label>
+                    Method Type
+                  </label>
+                  <div class="field">
+                    <sui-select id="methodType" name="methodTyoe" required class="selection" [(ngModel)]="methodDetails.selectedMethod">
+                      <sui-select-option *ngFor="let method of teachingMethodList" [value]="method.name"></sui-select-option>
+                    </sui-select>
+                  </div>
+                </div>
+              </div>
+              <div class="six wide column">
+                <div class="field">
+                  <label>
+                    Duration (Minutes)
+                  </label>
+                  <div class="field">
+                    <input required name="duration" [(ngModel)]="methodDetails.methodDuration" min="1" placeholder="45 Minutes"
+                      type="number">
+                  </div>
+                </div>
+              </div>
+              <div class="twelve wide column">
+                <div class="field">
+                  <label>
+                    Short Instructions
+                  </label>
+                  <div class="field">
+                    <input required name="shortDescription" [(ngModel)]="methodDetails.methodDescription" type="text">
+                  </div>
+                </div>
+              </div>
+              <div class="twelve wide column">
+                <div class="field">
+                  <label>
+                    Detailed Instructions
+                  </label>
+                  <div class="field margin-top-15">
+                    <button (click)="initializeImagePicker()" class="ui icon button insert-image-btn">
+                      <i class="image outline icon"></i>
+                    </button>
+                    <div id="editor"></div>
+                    <!-- <ckeditor id="editor" name="body" [config]="config" [editor]="Editor" [(ngModel)]="model.editorData"></ckeditor> -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="ui stacked segments" *ngIf="associatedResources.length > 0">
+        <div class="ui segment">
+          <h2 class="ui header">Resources</h2>
+        </div>
+        <div *ngFor="let resource of associatedResources" class="ui raised segment">
+          <div class="ui grid">
+            <div class="two wide column">
+              <img class="ui small image" [src]="resource.appIcon ? resource.appIcon : 'assets/images/default.png'">
+            </div>
+            <div class="eight wide column">
+              <h3 class="ui header">{{resource.name}}
+              </h3>
+              <div class="content">
+                {{resource.description}}
+              </div>
+            </div>
+            <div class="two wide column remove-icon">
+              <a (click)="removeResource(resource)" class="ui label">
+                <i class="trash icon"></i> Remove
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div class="one wide column"></div>
+  </div>
+</div>
+
+<div class="ui bottom fixed menu">
+  <div class="ui container p-10">
+    <div class="right menu">
+      <div class="item">
+        <div (click)="initializeResourcePicker()" class="ui primary right floated  button">
+          Add Resource
+        </div>
+      </div>
+      <div class="item">
+        <button [disabled]="!myForm.valid" (click)="updateMethodData()" class="ui primary button">
+          <i class="cloud upload icon"></i>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissResourcePicker()" *ngIf="showResourcePicker"
+  [size]="'large'" [isFullScreen]="false" [mustScroll]="true" #modal2>
+  <div class="header">Add Resource</div>
+  <div class="scrolling content" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="500"
+    [scrollWindow]="false" (scrolled)="lazyloadResources()">
+    <div class="ui four cards" *ngIf="myResources.length > 0 else noResorce">
+      <div *ngFor="let data of myResources" [ngClass]="{'green' : data.selected}" class="ui card resource-card">
+        <div (click)="selectResource(data)" class="ui slide masked reveal image">
+          <img [src]="data.appIcon ? data.appIcon : 'assets/images/default.png'" class="visible content resource-image">
+          <div class="hidden content resource-hidden-content">
+            <div class="ui middle aligned divided list">
+              <div class="item">
+                <div class="right floated content">
+                  {{data.board}}
+                </div>
+                <div class="content">
+                  Board
+                </div>
+              </div>
+              <div class="item">
+                <div class="right floated content">
+                  {{data.gradeLevel?.join()}}
+                </div>
+                <div class="content">
+                  Class
+                </div>
+              </div>
+              <div class="item">
+                <div class="right floated content">
+                  {{data.subject}}
+                </div>
+                <div class="content">
+                  Subject
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content">
+          <a class="header">{{data.name}}</a>
+          <div class="meta">
+            <span class="date">{{data.description | slice:0:200}}</span>
+            <span class="date" *ngIf="data.description?.length > 200">...</span>
+          </div>
+        </div>
+        <!-- <div class="extra content">
+          <a>
+            {{data.creator}}
+          </a>
+        </div> -->
+      </div>
+    </div>
+    <ng-template #noResorce>
+      <div class="text-center">
+        No Resource Found
+      </div>
+    </ng-template>
+  </div>
+  <div class="actions">
+    <div class="ui buttons">
+      <button (click)="dismissResourcePicker()" class="ui button">Cancel</button>
+      <div class="or"></div>
+      <button [disabled]="myResources.length < 1" (click)="addResources();dismissResourcePicker()" class="ui primary button">Save</button>
+    </div>
+  </div>
+</sui-modal>
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissImagePicker()" *ngIf="showImagePicker" [size]="'normal'"
+  [isFullScreen]="false" [mustScroll]="true" #modal>
+  <div class="header">Select Image</div>
+  <div class="content">
+    <sui-tabset>
+      <div class="ui tabular menu">
+        <a class="item" (activate)="getMyImages(0)" suiTabHeader="1">My Images</a>
+        <a class="item" (activate)="getAllImages(0)" suiTabHeader="2">All Image</a>
+      </div>
+      <div class="ui segment asset_container" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="500"
+        [scrollWindow]="false" (scrolled)="lazyloadMyImages()" suiTabContent="1">
+        <div class="ui small middle aligned bordered images custom-image">
+          <img *ngFor="let data of myAssets" (click)="addImageInEditor(data.artifactUrl)" [src]="data.artifactUrl">
+        </div>
+      </div>
+      <div class="ui segment asset_container" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="500"
+        [scrollWindow]="false" (scrolled)="lazyloadAllImages()" suiTabContent="2">
+        <div class="ui small middle aligned bordered images custom-image">
+          <img *ngFor="let data of allImages" (click)="addImageInEditor(data.artifactUrl)" [src]="data.artifactUrl">
+        </div>
+      </div>
+    </sui-tabset>
+  </div>
+  <div class="actions">
+    <div class="ui left floated buttons">
+      <button (click)="initiateImageUploadModal();" class="ui primary button">Upload and use</button>
+    </div>
+    <div class="ui buttons">
+      <button (click)="dismissImagePicker();" class="ui button">Cancel</button>
+      <!-- <div class="or"></div>
+      <button (click)="dismissImagePicker();" class="ui primary button">Save</button> -->
+    </div>
+  </div>
+</sui-modal>
+
+<sui-modal [isClosable]="true" [isInverted]="true" (dismissed)="dismissImageUploadModal()" *ngIf="showImageUploadModal"
+  [size]="'normal'" [isFullScreen]="false" [mustScroll]="true" #modal3>
+  <div class="header">Upload and Use</div>
+  <div class="content">
+    <div class="ui grid">
+      <div class="one wide column"></div>
+      <div class="ten wide column">
+        <div>
+          <input (change)="uploadImage($event)" type="file" accept="image/jpeg, image/jpg, image/png" name="assetfile">
+        </div>
+        <div class="ui info message">
+          <p>Allowed file types are: jpeg, jpg, png</p>
+          <p>Maximum allowed file size: 1 MB</p>
+        </div>
+        <div *ngIf="showErrorMsg" class="ui error message">
+          <p>{{errorMsg}}</p>
+        </div>
+      </div>
+      <div class="one wide column"></div>
+    </div>
+  </div>
+  <div class="actions">
+    <div class="ui left floated buttons">
+      <button (click)="dismissImageUploadModal();" class="ui primary button">Back</button>
+    </div>
+    <div class="ui buttons">
+      <button (click)="dismissImageUploadModal();" class="ui button">Cancel</button>
+      <!-- <div class="or"></div>
+      <button (click)="dismissImageUploadModal();" class="ui primary button">Upload and use</button> -->
+    </div>
+  </div>
+</sui-modal>

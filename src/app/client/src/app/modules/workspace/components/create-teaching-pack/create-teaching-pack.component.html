@@ -1,0 +1,98 @@
+<div>
+  <div class="ui fixed main menu bs-0 main-header d-block">
+    <div class="ui container primary-header p-10">
+      <div role="banner" class="ui logo d-flex flex-ai-center">
+        <a class="d-flex flex-ai-center">
+          <img class="image centered cursor-pointer" alt="sunbird" src="assets/images/sunbird_logo.png">
+        </a>
+      </div>
+      <div (click)="goToPacks()" class="circular ui icon button">
+        <i class="close icon"></i>
+      </div>
+    </div>
+  </div>
+  <div class="ui p-20">
+    <div class="ui grid">
+      <div class="one wide column"></div>
+      <div class="ten wide stretched column" *ngIf="showLoader">
+        <app-loader></app-loader>
+      </div>
+      <div *ngIf="!showLoader" class="ten wide stretched column">
+        <div class="ui segment">
+          <div class="ui grid">
+            <div class="workspacesegment pusher wide column">
+              <h4 class="ui header">
+                <div class="content">
+                 {{topicName}}
+                </div>
+              </h4>
+              <form class="ui form">
+                <div class="content">
+                  <div class="ui grid">
+                    <div class="twelve wide column">
+                      <div class="field">
+                        <label>
+                          Plan Name
+                        </label>
+                        <div class="field">
+                          <input placeholder="plan name" [(ngModel)]="lessonName" name="name" type="text">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="twelve wide column">
+                      <div class="field">
+                        <label>
+                          Plan Description
+                        </label>
+                        <div class="field">
+                          <input placeholder="add a plan description here" [(ngModel)]="lessonDescription" name="description"
+                            type="text">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              <div class="ui cards stepcards">
+                <div class="card" *ngFor="let step of padagogySteps">
+                  <div class="content">
+                    <div class="header">
+                      <p>{{step.name}}</p>
+                    </div>
+                    <div class="meta">
+                      <p>{{step.info?.methodtype}}</p>
+                    </div>
+                    <div class="description">
+                      <p>
+                        {{step.info?.description | slice:0:60}}
+                        <i *ngIf="step.info?.description?.length > 60">...</i>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="ui bottom attached button" (click)="addNewMethod(step)">
+                    <i *ngIf="!!!step.info?.identifier" class="add icon"></i>
+                    <i *ngIf="!!step.info?.identifier" class="edit icon"></i>
+                    {{step.info?.identifier ? 'Edit Method' : 'Add Method' }}
+                  </div>
+                </div>
+              </div>
+              <div class="actions actions margin-top-15">
+                <div (click)="updatePlanMetaData()" class="ui primary right floated  button">
+                  <i class="cloud upload icon"></i>
+                  Save
+                </div>
+                <div (click)="submitForReview()" class="ui primary right floated  button">
+                  Submit for Review
+                </div>
+                <div (click)="previewTeachingPack()" class="ui primary right floated  button">
+                  Preview
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="one wide column"></div>
+    </div>
+  </div>
+</div>

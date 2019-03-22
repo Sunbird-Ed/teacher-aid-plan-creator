@@ -5,7 +5,8 @@ import { WorkspaceRoutingModule } from './workspace-routing.module';
 import { SharedModule } from '@sunbird/shared';
 import { SuiModule } from 'ng2-semantic-ui/dist';
 import { FormsModule, ReactiveFormsModule, } from '@angular/forms';
-import { WorkSpaceService, EditorService , BatchService, ReviewCommentsService} from './services';
+import { WorkSpaceService, EditorService, BatchService, ReviewCommentsService, TeachingPackService } from './services';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {
   WorkspaceComponent, CreateContentComponent, DraftComponent,
   ReviewSubmissionsComponent, PublishedComponent, UploadedComponent,
@@ -16,12 +17,16 @@ import {
   UpforreviewContentplayerComponent, FlagConentplayerComponent, ReviewsubmissionsContentplayerComponent,
   PublishedPopupComponent, RequestChangesPopupComponent, LimitedPublishedComponent,
   AllContentComponent, FlagReviewerComponent, AllMyContentFilterComponent, CollaboratingOnComponent,
-  CollaborationContentFilterComponent
+  CollaborationContentFilterComponent, TeachingPackComponent, PadagogyTopicSelectorComponent, CreateTeachingPackComponent,
+  CreateTeachingMethodComponent, TeachingPackFilterComponent, ReviewTeachingPackComponent
 } from './components';
 import { NgInviewModule } from 'angular-inport';
 import { TelemetryModule } from '@sunbird/telemetry';
 import { ReviewCommentsComponent } from './components/review-comments/review-comments.component';
 import { OrderModule } from 'ngx-order-pipe';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { TreeNgxModule } from 'tree-ngx';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -33,7 +38,10 @@ import { OrderModule } from 'ngx-order-pipe';
     ReactiveFormsModule,
     NgInviewModule,
     TelemetryModule,
-    OrderModule
+    OrderModule,
+    CKEditorModule,
+    TreeNgxModule,
+    InfiniteScrollModule
   ],
   declarations: [WorkspaceComponent, WorkspacesidebarComponent,
     CreateContentComponent, DraftComponent, ReviewSubmissionsComponent,
@@ -53,7 +61,13 @@ import { OrderModule } from 'ngx-order-pipe';
     CollaborationContentFilterComponent,
     ReviewCommentsComponent,
     CollaborationContentFilterComponent,
+    TeachingPackComponent,
+    PadagogyTopicSelectorComponent,
+    CreateTeachingPackComponent,
+    CreateTeachingMethodComponent,
+    TeachingPackFilterComponent,
+    ReviewTeachingPackComponent
   ],
-  providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService]
+  providers: [WorkSpaceService, EditorService, BatchService, ReviewCommentsService, TeachingPackService]
 })
 export class WorkspaceModule { }

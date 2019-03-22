@@ -1,31 +1,36 @@
 
-import { combineLatest, Observable } from 'rxjs';
-import { WorkSpace } from './../../classes/workspace';
+import { combineLatest as observableCombineLatest, Observable } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SearchService, UserService, PermissionService } from '@sunbird/core';
+import { WorkSpace } from '../../classes/workspace';
+import { SearchService, UserService, ISort } from '@sunbird/core';
 import {
   ServerResponse, PaginationService, ConfigService, ToasterService,
-  ResourceService, IContents, ILoaderMessage, INoResultMessage, IUserData
+  ResourceService, ILoaderMessage, INoResultMessage, IContents
 } from '@sunbird/shared';
+import { Ibatch, IStatusOption } from './../../interfaces/';
 import { WorkSpaceService } from '../../services';
 import { IPagination } from '@sunbird/announcement';
 import * as _ from 'lodash';
+import { IImpressionEventInput } from '@sunbird/telemetry';
 import { SuiModalService, TemplateModalConfig, ModalTemplate } from 'ng2-semantic-ui';
-import { IInteractEventInput, IImpressionEventInput } from '@sunbird/telemetry';
-/**
- * The upforReview component search for all the upforreview content
-*/
 
 @Component({
-  selector: 'app-up-for-review',
-  templateUrl: './up-for-review.component.html',
-  styleUrls: ['./up-for-review.component.css']
+  selector: 'app-teaching-pack',
+  templateUrl: './teaching-pack.component.html',
+  styleUrls: ['./teaching-pack.component.css']
 })
-export class UpForReviewComponent extends WorkSpace implements OnInit {
+export class TeachingPackComponent extends WorkSpace implements OnInit {
+  @ViewChild('modalTemplate')
+  public modalTemplate: ModalTemplate<{ data: string }, string, string>;
   /**
-  * To navigate to other pages
-  */
+     * state for content editior
+    */
+  state: string;
+
+  /**
+   * To navigate to other pages
+   */
   route: Router;
 
   /**
@@ -41,7 +46,7 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
   /**
    * Contains list of published course(s) of logged-in user
   */
-  upForReviewContentData: Array<IContents> = [];
+  allContent: Array<IContents> = [];
 
   /**
    * To show / hide loader
@@ -57,6 +62,16 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
    * To show / hide no result message when no result found
   */
   noResult = false;
+
+  /**
+   * lock popup data for locked contents
+  */
+  lockPopupData: object;
+
+  /**
+   * To show content locked modal
+  */
+  showLockedContentModal = false;
 
   /**
    * To show / hide error
@@ -83,23 +98,57 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
   */
   public config: ConfigService;
   /**
-     * Contains page limit of inbox list
+  * Contains page limit of inbox list
   */
   pageLimit: number;
-
   /**
-    * Current page number of inbox list
+  * Current page number of inbox list
   */
   pageNumber = 1;
 
   /**
-    * totalCount of the list
+  * totalCount of the list
   */
   totalCount: Number;
-
+  /**
+    status for preselection;
+  */
+  status: string;
+  /**
+  route query param;
+  */
+  queryParams: any;
+  /**
+  redirectUrl;
+  */
+  public redirectUrl: string;
+  /**
+  filterType;
+  */
+  public filterType: string;
+  /**
+  sortingOptions ;
+  */
+  public sortingOptions: Array<ISort>;
+  /**
+  sortingOptions ;
+  */
+  sortByOption: string;
+  /**
+  sort for filter;
+  */
+  sort: object;
+  /**
+	 * inviewLogs
+	*/
+  inviewLogs = [];
+  /**
+* value typed
+*/
+  query: string;
   /**
   * Contains returned object of the pagination service
-  * which is needed to show the pagination on inbox view
+  * which is needed to show the pagination on all content view
   */
   pager: IPagination;
 
@@ -107,30 +156,15 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
   * To show toaster(error, success etc) after any API calls
   */
   private toasterService: ToasterService;
-
-  queryParams: any;
-  sort: object;
-  state: string;
-  /**
-   * userRoles
-  */
-  userRoles = [];
-  /**
-  * To call resource service which helps to use language constant
- */
-  public resourceService: ResourceService;
-  /**
-    * reference of permissionService service.
-  */
-  public permissionService: PermissionService;
   /**
 	 * telemetryImpression
 	*/
   telemetryImpression: IImpressionEventInput;
   /**
-	 * inviewLogs
-	*/
-  inviewLogs = [];
+  * To call resource service which helps to use language constant
+  */
+  public resourceService: ResourceService;
+
   /**
     * Constructor to create injected service(s) object
     Default method of Draft Component class
@@ -140,15 +174,14 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
     * @param {PaginationService} paginationService Reference of PaginationService
     * @param {ActivatedRoute} activatedRoute Reference of ActivatedRoute
     * @param {ConfigService} config Reference of ConfigService
-    * @param {permissionService} permissionService Refrence of permission service to check permission
   */
-  constructor(public modalService: SuiModalService, public searchService: SearchService,
+  constructor(public searchService: SearchService,
     public workSpaceService: WorkSpaceService,
     paginationService: PaginationService,
     activatedRoute: ActivatedRoute,
     route: Router, userService: UserService,
     toasterService: ToasterService, resourceService: ResourceService,
-    config: ConfigService, permissionService: PermissionService) {
+    config: ConfigService, public modalService: SuiModalService) {
     super(searchService, workSpaceService, userService);
     this.paginationService = paginationService;
     this.route = route;
@@ -157,15 +190,17 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
     this.toasterService = toasterService;
     this.resourceService = resourceService;
     this.config = config;
+    this.state = 'allcontent';
     this.loaderMessage = {
-      'loaderMessage': this.resourceService.messages.stmsg.m0032,
+      'loaderMessage': this.resourceService.messages.stmsg.m0110,
     };
-    this.state = 'upForReview';
-    this.permissionService = permissionService;
+    this.sortingOptions = this.config.dropDownConfig.FILTER.RESOURCES.sortingOptions;
   }
 
   ngOnInit() {
-    combineLatest(
+    this.filterType = this.config.appConfig.allmycontent.filterType;
+    this.redirectUrl = this.config.appConfig.allmycontent.inPageredirectUrl;
+    observableCombineLatest(
       this.activatedRoute.params,
       this.activatedRoute.queryParams,
       (params: any, queryParams: any) => {
@@ -179,9 +214,9 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
           this.pageNumber = Number(bothParams.params.pageNumber);
         }
         this.queryParams = bothParams.queryParams;
-        this.fecthUpForReviewContent(this.config.appConfig.WORKSPACE.PAGE_LIMIT, this.pageNumber, bothParams);
+        this.query = this.queryParams['query'];
+        this.fecthAllContent(this.config.appConfig.WORKSPACE.PAGE_LIMIT, this.pageNumber, bothParams);
       });
-
     this.telemetryImpression = {
       context: {
         env: this.activatedRoute.snapshot.data.telemetry.env
@@ -195,11 +230,10 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
       }
     };
   }
-
   /**
   * This method sets the make an api call to get all UpForReviewContent with page No and offset
   */
-  fecthUpForReviewContent(limit: number, pageNumber: number, bothParams) {
+  fecthAllContent(limit: number, pageNumber: number, bothParams) {
     this.showLoader = true;
     if (bothParams.queryParams.sort_by) {
       const sort_by = bothParams.queryParams.sort_by;
@@ -210,30 +244,28 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
     } else {
       this.sort = { lastUpdatedOn: this.config.appConfig.WORKSPACE.lastUpdatedOn };
     }
-    const rolesMap = this.userService.RoleOrgMap;
+    const preStatus = ['Draft', 'FlagDraft', 'Review', 'Processing', 'Live', 'Unlisted', 'FlagReview'];
     const searchParams = {
       filters: {
-        status: ['Review'],
-        createdFor: this.userService.RoleOrgMap && _.compact(_.union(rolesMap['CONTENT_REVIEWER'],
-          rolesMap['BOOK_REVIEWER'],
-          rolesMap['CONTENT_REVIEW'])),
-        createdBy: { '!=': this.userService.userid },
+        status: bothParams.queryParams.status ? bothParams.queryParams.status : preStatus,
+        createdBy: this.userService.userid,
+        contentType: 'TeacherAid',
         objectType: this.config.appConfig.WORKSPACE.objectType,
         board: bothParams.queryParams.board,
         subject: bothParams.queryParams.subject,
         medium: bothParams.queryParams.medium,
         gradeLevel: bothParams.queryParams.gradeLevel,
+        // resourceType: ['Lesson Plan']
       },
       limit: limit,
       offset: (pageNumber - 1) * (limit),
       query: _.toString(bothParams.queryParams.query),
       sort_by: this.sort
     };
-    searchParams.filters['contentType'] = _.get(bothParams, 'queryParams.contentType') || this.getContentType();
-    this.search(searchParams).subscribe(
+    this.searchContentWithLockStatus(searchParams).subscribe(
       (data: ServerResponse) => {
         if (data.result.count && data.result.content.length > 0) {
-          this.upForReviewContentData = data.result.content;
+          this.allContent = data.result.content;
           this.totalCount = data.result.count;
           this.pager = this.paginationService.getPager(data.result.count, pageNumber, limit);
           this.showLoader = false;
@@ -243,8 +275,7 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
           this.noResult = true;
           this.showLoader = false;
           this.noResultMessage = {
-            'message': this.resourceService.messages.stmsg.m0008,
-            'messageText': this.resourceService.messages.stmsg.m0033
+            'messageText': this.resourceService.messages.stmsg.m0125
           };
         }
       },
@@ -252,10 +283,40 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
         this.showLoader = false;
         this.noResult = false;
         this.showError = true;
-        this.toasterService.error(this.resourceService.messages.fmsg.m0021);
+        this.toasterService.error(this.resourceService.messages.fmsg.m0081);
       }
     );
   }
+  public deleteConfirmModal(contentIds) {
+    const config = new TemplateModalConfig<{ data: string }, string, string>(this.modalTemplate);
+    config.isClosable = true;
+    config.size = 'mini';
+    this.modalService
+      .open(config)
+      .onApprove(result => {
+        this.showLoader = true;
+        this.loaderMessage = {
+          'loaderMessage': this.resourceService.messages.stmsg.m0034,
+        };
+        this.delete(contentIds).subscribe(
+          (data: ServerResponse) => {
+            this.showLoader = false;
+            this.allContent = this.removeAllMyContent(this.allContent, contentIds);
+            if (this.allContent.length === 0) {
+              this.ngOnInit();
+            }
+            this.toasterService.success(this.resourceService.messages.smsg.m0006);
+          },
+          (err: ServerResponse) => {
+            this.showLoader = false;
+            this.toasterService.error(this.resourceService.messages.fmsg.m0022);
+          }
+        );
+      })
+      .onDeny(result => {
+      });
+  }
+
   /**
    * This method helps to navigate to different pages.
    * If page number is less than 1 or page number is greater than total number
@@ -270,20 +331,39 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
       return;
     }
     this.pageNumber = page;
-    this.route.navigate(['workspace/content/upForReview', this.pageNumber], { queryParams: this.queryParams });
+    this.route.navigate(['workspace/content/teachingpack', this.pageNumber], { queryParams: this.queryParams });
   }
+
   contentClick(content) {
-    if (content.contentType === 'TeacherAid') {
-      const param = content;
-      param['userType'] = 'reviewer';
-      this.workSpaceService.navigateToContent(param, this.state);
-    } else {
-      this.workSpaceService.navigateToContent(content, this.state);
-    }
+    this.route.navigate(['workspace/new/teachingpack/', content.identifier]);
+    // if (_.size(content.lockInfo)) {
+    //   this.lockPopupData = content;
+    //   this.showLockedContentModal = true;
+    // } else {
+    //   const status = content.status.toLowerCase();
+    //   if (status !== 'processing') {
+    //     // only draft state contents need to be locked
+    //     if (status === 'draft') {
+    //       this.lockContent(content).subscribe(
+    //         (data: ServerResponse) => {
+    //           content.lock = data.result;
+    //           this.workSpaceService.navigateToContent(content, this.state);
+    //         },
+    //         (err: ServerResponse) => {
+    //           this.toasterService.error(this.resourceService.messages.fmsg.m0006);
+    //         }
+    //       );
+    //     } else {
+    //       this.workSpaceService.navigateToContent(content, this.state);
+    //     }
+    //   }
+    // }
   }
-  /**
-  * get inview  Data
-  */
+
+  public onCloseLockInfoPopup() {
+    this.showLockedContentModal = false;
+  }
+
   inview(event) {
     _.forEach(event.inview, (inview, key) => {
       const obj = _.find(this.inviewLogs, (o) => {
@@ -301,23 +381,13 @@ export class UpForReviewComponent extends WorkSpace implements OnInit {
     this.telemetryImpression.edata.subtype = 'pageexit';
     this.telemetryImpression = Object.assign({}, this.telemetryImpression);
   }
-  getContentType() {
-    this.userService.userData$.subscribe(
-      (user: IUserData) => {
-        this.userRoles = user.userProfile.userRoles;
-      });
-    let contentType = [];
-
-    if (_.indexOf(this.userRoles, 'BOOK_REVIEWER') !== -1) {
-      contentType = ['TextBook'];
-    }
-    if (_.indexOf(this.userRoles, 'CONTENT_REVIEWER') !== -1) {
-      contentType = _.without(this.config.appConfig.WORKSPACE.contentType, 'TextBook');
-    }
-    if (_.indexOf(this.userRoles, 'CONTENT_REVIEWER') !== -1 &&
-      _.indexOf(this.userRoles, 'BOOK_REVIEWER') !== -1) {
-      contentType = this.config.appConfig.WORKSPACE.contentType;
-    }
-    return contentType;
+  removeAllMyContent(contentList, requestData) {
+    return contentList.filter((content) => {
+      return requestData.indexOf(content.identifier) === -1;
+    });
+  }
+  go() {
+    this.route.navigate(['teachingaid']);
   }
 }
+

@@ -1,0 +1,56 @@
+.vertical.menu.left-steps-menu {
+  width: auto
+}
+
+.ui.segment.method-description {
+  height: 100%;
+  margin: 0;
+}
+
+.method-description .ui.comments {
+  margin: 0;
+  max-width: inherit;
+}
+
+::ng-deep .long-description .image img {
+  max-width: 100%;
+}
+
+::ng-deep .image-style-align-left {
+  /* float: left; */
+  margin: 0;
+  max-width: 100%;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+::ng-deep .image-style-align-left img {
+  max-width: 50% !important;
+}
+
+::ng-deep .image-style-align-right {
+  /* float: right; */
+  margin: 0;
+  max-width: 100%;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+::ng-deep .image-style-align-right img {
+  max-width: 50% !important;
+}
+
+::ng-deep .table table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px double #b3b3b3;
+}
+
+::ng-deep .table table td {
+  min-width: 2em;
+  padding: .4em;
+  border: 1px solid #d9d9d9;
+}
+.review-container {
+  min-height: 100vh;
+}

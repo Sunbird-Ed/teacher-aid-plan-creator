@@ -1,0 +1,114 @@
+<sui-modal [isClosable]="true" [size]="'small'" [isFullScreen]="false" [mustScroll]="true" (dismissed)="goToTeachingPack(); "
+  #modal>
+
+  <div *ngIf="!showTopicSelector && !showPadagogySelector" class="ui segment mt-10">
+    <div class="ui">
+      <div class=" mb-15">
+        <div class="ui grid">
+          <div class="eleven wide column">
+            <span class="ui header">
+              Create Teching Pack
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form class="ui form">
+      <div class="content">
+        <div *ngIf="formFieldProperties && categoryMasterList">
+          <app-content-creation-default-template #formData [formFieldProperties]="formFieldProperties"
+            [categoryMasterList]="categoryMasterList">
+          </app-content-creation-default-template>
+        </div>
+        <div class="actions mt-10">
+          <p class="text-align-center pt-20">
+            <button class="ui primary text-align-center icon button" (click)="goToPedagogyScreen()">
+              {{resourceService?.frmelmnts?.btn?.startcreating}}
+            </button>
+          </p>
+
+          <div>
+            <label>
+              <p class="text-align-center mt-10">
+                {{resourceService?.frmelmnts?.lbl?.agreeandproceedtext}}
+              </p>
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <ng-template [ngIf]="showPadagogySelector" #topicsSec>
+    <div class="ui content margin-top-0">
+      <div class="ui segment">
+        <h6 class="ui horizontal divider">
+          Select Pedagogy Flow
+        </h6>
+        <ng-template let-option #optionTemplate>
+          <div class="margin-bottom-10">
+            <b>{{ option.name }}</b>
+          </div>
+          <div class="ui horizontal bulleted list">
+            <li class="item" *ngFor="let data of option.pedagogyStep">{{ data.name }}</li>
+          </div>
+        </ng-template>
+        <sui-select class="selection fluid" [(ngModel)]="selectedFlow" [options]="padagogyList" labelField="name"
+          [optionTemplate]="optionTemplate" [isSearchable]="true" #templated>
+          <sui-select-option *ngFor="let o of templated.filteredOptions" [value]="o"></sui-select-option>
+        </sui-select>
+      </div>
+    </div>
+    <div class="actions">
+      <button (click)="goToTopicScreen()" [disabled]="!!!selectedFlow" class="ui primary button">
+        Proceed
+        <i class="right chevron icon"></i>
+      </button>
+    </div>
+  </ng-template>
+  <ng-template [ngIf]="showTopicSelector">
+    <div class="ui content margin-top-0">
+      <div class="ui segment">
+        <h6 class="ui horizontal divider">
+          Select Topic
+        </h6>
+        <form class="ui form">
+          <div class="field mb-20">
+            <input (keyup)="searchTopic($event)" name="searchTopic" type="text" placeholder="Search Topic">
+          </div>
+        </form>
+        <div class="scrolling content topic-list-container">
+          <div *ngIf="seachTopicString.length > 0 else allTopics" class="topic-selector">
+            <tree-ngx [options]="treeOptions" (selectedItems)="selecedItemsChanged($event)" [nodeItems]="filteredTopics">
+              <ng-template #nodeCollapsibleTemplatee let-expanded="expanded">
+                <span *ngIf="expanded"><i class="minus square outline icon"></i></span>
+                <span *ngIf="!expanded"><i class="plus square outline icon"></i></span>
+              </ng-template>
+            </tree-ngx>
+          </div>
+          <ng-template #allTopics>
+            <div class="topic-selector" *ngIf="topics.length > 0 else noResult">
+              <tree-ngx [options]="treeOptions" (selectedItems)="selecedItemsChanged($event)" [nodeItems]="topics">
+                <ng-template #nodeCollapsibleTemplate let-expanded="expanded">
+                  <span *ngIf="expanded"><i class="minus square outline icon"></i></span>
+                  <span *ngIf="!expanded"><i class="plus square outline icon"></i></span>
+                </ng-template>
+              </tree-ngx>
+            </div>
+          </ng-template>
+          <ng-template #noResult>
+            <div class="text-center p-20">
+              No topic found
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button (click)="createContent()" [disabled]="!selectedTopic?.length" class="ui primary button">
+        Proceed
+        <i class="right chevron icon"></i>
+      </button>
+    </div>
+  </ng-template>
+
+</sui-modal>
